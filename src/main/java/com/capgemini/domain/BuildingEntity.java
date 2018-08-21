@@ -28,14 +28,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name="BUILDING")
-public class BuildingEntity implements Serializable {
+public class BuildingEntity extends AbstractEntity implements Serializable {
 	
 	
 	private static final long serialVersionUID = 1L;
 	
-	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
-	private Long id;
+
 	@Column(nullable=true)
 	private String description;
 	@Embedded
@@ -51,6 +49,12 @@ public class BuildingEntity implements Serializable {
 	@OneToMany(mappedBy="building")
 	private List<FlatEntity> flats;
 	
+	
+	public void addFlat(FlatEntity flat){
+		flats.add(flat);
+		flat.setBuilding(this);
+		
+	}
 	
 	
 

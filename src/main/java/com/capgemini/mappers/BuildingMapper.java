@@ -39,9 +39,9 @@ public class BuildingMapper {
 
 	public BuildingTO mapToTO(BuildingEntity building) {
 
-		return BuildingTO.builder().description(building.getDescription()).location(createCopy(building.getLocation()))
-				.storeysNumber(building.getStoreysNumber()).hasElevator(building.getHasElevator())
-				.flatCount(building.getFlatCount())
+		return BuildingTO.builder().id(building.getId()).description(building.getDescription())
+				.location(createCopy(building.getLocation())).storeysNumber(building.getStoreysNumber())
+				.hasElevator(building.getHasElevator()).flatCount(building.getFlatCount())
 				.flats(building.getFlats() == null ? new ArrayList<Long>() : mapCollectionToLong(building.getFlats()))
 				.build();
 	}

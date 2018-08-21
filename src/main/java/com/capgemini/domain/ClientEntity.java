@@ -1,16 +1,14 @@
 package com.capgemini.domain;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinTable;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -27,42 +25,43 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name="CLIENT")
-public class ClientEntity {
-	
-	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
-	private Long id;
-	@Column(nullable=false)
+@Table(name = "CLIENT")
+public class ClientEntity extends AbstractEntity implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Column(nullable = false)
 	private String lastName;
-	@Column(nullable=false)
+	@Column(nullable = false)
 	private String firstName;
 	@Embedded
-	@Column(nullable=false)
+	@Column(nullable = false)
 	private Address address;
-	@Column(nullable=false)
+	@Column(nullable = false)
 	private String phoneNumber;
-	@Column(nullable=false)
+	@Column(nullable = false)
 	private String eMail;
-	@Column(nullable=false)
+	@Column(nullable = false)
 	private Date dateOfBirth;
-	
-	@OneToMany(mappedBy="owner")
+
+	@OneToMany(mappedBy = "owner")
 	private List<FlatEntity> flatsOwned;
-	
+
 	@ManyToMany
-	@JoinTable(
-    		name="CLIENT_FLAT",
-    		joinColumns={ @JoinColumn(name="client_id")},
-    		inverseJoinColumns = { @JoinColumn(name="flat_id") }
-			)
+	@JoinTable(name = "CLIENT_FLAT", joinColumns = { @JoinColumn(name = "client_id") }, inverseJoinColumns = {
+			@JoinColumn(name = "flat_id") })
 	private List<FlatEntity> flatsCoOwned;
 	
 	
+	public void addOwnedFlat(FlatEntity flat){
+		flatsOwned.add(flat);
+		flat.setOwner(this);
+	}
 	
-	
-	
-	
-	
+	public void addCoOwnedFlat(FlatEntity flat){
+		flatsCoOwned.add(flat);
+		flat.addCoOwner(this);
+		
+	}
 
 }

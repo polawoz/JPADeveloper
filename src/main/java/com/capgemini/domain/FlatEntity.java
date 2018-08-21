@@ -1,6 +1,7 @@
 package com.capgemini.domain;
 
 
+import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -29,12 +30,14 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name="FLAT")
-public class FlatEntity {
+public class FlatEntity extends AbstractEntity implements Serializable {
 	
 	
-	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
-	private Long id;
+
+	private static final long serialVersionUID = 1L;
+	
+	
+
 	@Column(nullable=false)
 	private Double area;
 	@Column(nullable=false)
@@ -60,6 +63,15 @@ public class FlatEntity {
 	@ManyToMany(mappedBy="flatsCoOwned")
 	private List<ClientEntity> coOwners;
 	
+	
+	
+	protected void addCoOwner(ClientEntity client){
+		
+		coOwners.add(client);
+	}
+	
+	
+
 	
 	
 	
