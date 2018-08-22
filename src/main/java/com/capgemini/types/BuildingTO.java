@@ -26,6 +26,7 @@ public class BuildingTO {
 	private Boolean hasElevator;
 	private Integer flatCount;
 	private List<Long> flats;
+	private Long version;
 	
 	
 	

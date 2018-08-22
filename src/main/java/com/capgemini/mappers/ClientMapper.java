@@ -18,8 +18,10 @@ public class ClientMapper {
 		if (newClient == null) {
 			return null;
 		}
-
-		return ClientEntity.builder().lastName(newClient.getLastName()).firstName(newClient.getFirstName())
+		
+		
+		ClientEntity newEntity = ClientEntity.builder()
+				.lastName(newClient.getLastName()).firstName(newClient.getFirstName())
 				.address(createCopy(newClient.getAddress())).phoneNumber(newClient.getPhoneNumber())
 				.eMail(newClient.getEMail()).dateOfBirth(newClient.getDateOfBirth())
 				.flatsOwned(newClient.getFlatsOwnedIds() == null ? new ArrayList<FlatEntity>()
@@ -27,6 +29,11 @@ public class ClientMapper {
 				.flatsCoOwned(newClient.getFlatsCoOwnedIds() == null ? new ArrayList<FlatEntity>()
 						: new ArrayList<FlatEntity>())
 				.build();
+		
+		newEntity.setVersion(newClient.getVersion());
+		
+
+		return newEntity;
 	}
 
 	public Address createCopy(Address address) {
@@ -42,6 +49,7 @@ public class ClientMapper {
 
 	public ClientTO mapToTO(ClientEntity client) {
 
+		
 		return ClientTO.builder()
 				.id(client.getId())
 				.lastName(client.getLastName()).firstName(client.getFirstName())
@@ -51,6 +59,7 @@ public class ClientMapper {
 						: mapCollectionToLong(client.getFlatsOwned()))
 				.flatsCoOwnedIds(client.getFlatsCoOwned() == null ? new ArrayList<Long>()
 						: mapCollectionToLong(client.getFlatsCoOwned()))
+				.version(client.getVersion())
 				.build();
 	}
 
@@ -79,6 +88,34 @@ public class ClientMapper {
 		}
 
 		return mappedList;
+	}
+
+	public ClientTO update(ClientTO client, ClientEntity clientToUpdate) {
+
+		if(client==null || clientToUpdate==null){
+			return null;
+		}
+		
+		if(client.getLastName()!=null){
+			clientToUpdate.setLastName(client.getLastName());
+		}
+		if(client.getFirstName()!=null){
+			clientToUpdate.setFirstName(client.getFirstName());
+		}
+		if(client.getAddress()!=null){
+			clientToUpdate.setAddress(createCopy(client.getAddress()));
+		}
+		if(client.getPhoneNumber()!=null){
+			clientToUpdate.setPhoneNumber(client.getPhoneNumber());
+		}
+		if(client.getEMail()!=null){
+			clientToUpdate.setEMail(client.getEMail());
+		}
+		if(client.getDateOfBirth()!=null){
+			clientToUpdate.setDateOfBirth(client.getDateOfBirth());
+		}
+
+		return mapToTO(clientToUpdate);
 	}
 
 }

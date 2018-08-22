@@ -19,11 +19,15 @@ public class BuildingMapper {
 			return null;
 		}
 
-		return BuildingEntity.builder().description(newBuilding.getDescription())
+		BuildingEntity newEntity = BuildingEntity.builder().description(newBuilding.getDescription())
 				.location(createCopy(newBuilding.getLocation())).storeysNumber(newBuilding.getStoreysNumber())
 				.hasElevator(newBuilding.getHasElevator()).flatCount(newBuilding.getFlatCount())
 				.flats(newBuilding.getFlats() == null ? new ArrayList<FlatEntity>() : new ArrayList<FlatEntity>())
 				.build();
+
+		newEntity.setVersion(newBuilding.getVersion());
+
+		return newEntity;
 	}
 
 	public Address createCopy(Address address) {
@@ -39,11 +43,13 @@ public class BuildingMapper {
 
 	public BuildingTO mapToTO(BuildingEntity building) {
 
-		return BuildingTO.builder().id(building.getId()).description(building.getDescription())
+		BuildingTO buildingTO = BuildingTO.builder().id(building.getId()).description(building.getDescription())
 				.location(createCopy(building.getLocation())).storeysNumber(building.getStoreysNumber())
 				.hasElevator(building.getHasElevator()).flatCount(building.getFlatCount())
 				.flats(building.getFlats() == null ? new ArrayList<Long>() : mapCollectionToLong(building.getFlats()))
-				.build();
+				.version(building.getVersion()).build();
+
+		return buildingTO;
 	}
 
 	public List<Long> mapCollectionToLong(List<FlatEntity> flatsList) {
@@ -72,5 +78,39 @@ public class BuildingMapper {
 
 		return mappedList;
 	}
+	
+	
+
+	public BuildingTO update(BuildingTO buildingTO, BuildingEntity buildingToUpdate) {
+
+		if(buildingTO==null || buildingToUpdate==null){
+			return null;
+		}
+		
+		if (buildingTO.getDescription() != null) {
+			buildingToUpdate.setDescription(buildingTO.getDescription());
+		}
+
+		if (buildingTO.getLocation() != null) {
+			buildingToUpdate.setLocation(createCopy(buildingTO.getLocation()));
+		}
+
+		if (buildingTO.getStoreysNumber() != null) {
+			buildingToUpdate.setStoreysNumber(buildingTO.getStoreysNumber());
+		}
+
+		if (buildingTO.getHasElevator() != null) {
+			buildingToUpdate.setHasElevator(buildingTO.getHasElevator());
+		}
+
+		if (buildingTO.getFlatCount() != null) {
+			buildingToUpdate.setFlatCount(buildingTO.getFlatCount());
+		}
+
+		return mapToTO(buildingToUpdate);
+	}
+	
+	
+	
 
 }

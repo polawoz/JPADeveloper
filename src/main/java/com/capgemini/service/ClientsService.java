@@ -12,12 +12,17 @@ public interface ClientsService {
 	
 	ClientTO findClientById(ClientTO client);
 	
+	ClientTO updateClient(ClientTO client);
+	
+	ClientTO removeClient(ClientTO client);
+	
 	FlatTO makeReservation(FlatTO flat, ClientTO owner, List<ClientTO> coOwners);
 	
-	FlatTO buyFlatAfterReservation(FlatTO flat);
+	FlatTO buyFlatAfterReservation(FlatTO flat, ClientTO client);
 	
 	FlatTO buyFlat(FlatTO flat, ClientTO owner, List<ClientTO> coOwners);
 	
+	FlatTO cancelReservation(FlatTO flat);
 	
 	
 

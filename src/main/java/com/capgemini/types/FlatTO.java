@@ -26,11 +26,9 @@ public class FlatTO {
 	private Address location;
 	private FlatStatus status;
 	private Double price;
-
 	private Long buildingId;
-
 	private Long ownerId;
-
 	private List<Long> coOwnersId;
+	private Long version;
 
 }

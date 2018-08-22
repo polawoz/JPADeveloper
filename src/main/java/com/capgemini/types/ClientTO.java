@@ -27,5 +27,6 @@ public class ClientTO {
 	private Date dateOfBirth;
 	private List<Long> flatsOwnedIds;
 	private List<Long> flatsCoOwnedIds;
+	private Long version;
 
 }

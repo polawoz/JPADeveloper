@@ -3,6 +3,7 @@ package com.capgemini.domain;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -46,7 +47,7 @@ public class BuildingEntity extends AbstractEntity implements Serializable {
 	@Column(nullable=false)
 	private Integer flatCount;
 	
-	@OneToMany(mappedBy="building")
+	@OneToMany(cascade = CascadeType.REMOVE, mappedBy="building")
 	private List<FlatEntity> flats;
 	
 	
