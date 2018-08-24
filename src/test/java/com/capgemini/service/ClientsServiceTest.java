@@ -652,7 +652,8 @@ public class ClientsServiceTest {
 		
 		//then
 		assertEquals(foundFlatsListSizeBefore+2, foundFlats.size());
-		
+		assertTrue(foundFlats.stream().anyMatch(b-> b.getId().equals(savedFlat.getId())));
+		assertTrue(foundFlats.stream().anyMatch(b-> b.getId().equals(anotherSavedFlat.getId())));
 		
 		
 		

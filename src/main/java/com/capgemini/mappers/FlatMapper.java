@@ -70,7 +70,10 @@ public class FlatMapper {
 	}
 
 	public List<FlatTO> mapToTOList(List<FlatEntity> flatEntityList) {
-
+		if(flatEntityList==null){
+			return null;
+		}
+		
 		List<FlatTO> mappedList = new ArrayList<>();
 
 		for (FlatEntity f : flatEntityList) {

@@ -4,13 +4,16 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
 
 import org.springframework.stereotype.Repository;
 
 import com.capgemini.dao.FlatRepositoryCustom;
 import com.capgemini.domain.FlatEntity;
+import com.capgemini.domain.QFlatEntity;
 import com.capgemini.types.FlatSearchParamsTO;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+
 
 @Repository
 public class FlatRepositoryImpl implements FlatRepositoryCustom {
@@ -22,76 +25,58 @@ public class FlatRepositoryImpl implements FlatRepositoryCustom {
 	@Override
 	public List<FlatEntity> findUnsoldFlatsByCriteria(FlatSearchParamsTO flatSearchParamsTO) {
 		
-		//TODO
+		QFlatEntity flat = QFlatEntity.flatEntity;
 		
-		//JPAQueryFactory queryFactory = new JPAQueryFactory();
+		JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
 		
-		
-		
-		TypedQuery<FlatEntity> query = entityManager.createQuery(createQueryFromParamsTO(flatSearchParamsTO),
-				FlatEntity.class);
-		
-//		if(flatSearchParamsTO.getAreaMin()==null){
-//			query.setParameter("areaMin", flatSearchParamsTO.getAreaMin());
-//		}
-//		if(flatSearchParamsTO.getAreaMax()==null){
-//			query.setParameter("areaMax", flatSearchParamsTO.getAreaMax());
-//		}
-//		if(flatSearchParamsTO.getRoomsCountMin()==null){
-//			query.setParameter("roomsCountMin", flatSearchParamsTO.getRoomsCountMin());
-//		}
-//		if(flatSearchParamsTO.getRoomsCountMax()==null){
-//			query.setParameter("roomsCountMax", flatSearchParamsTO.getRoomsCountMax());
-//		}
-//		if(flatSearchParamsTO.getBalconyCountMin()==null){
-//			query.setParameter("balconyCountMin", flatSearchParamsTO.getBalconyCountMin());
-//		}
-//		if(flatSearchParamsTO.getBalconyCountMax()==null){
-//			query.setParameter("balconyCountMin", flatSearchParamsTO.getBalconyCountMax());
-//		}
-
-		return query.getResultList();
-	}
-	
-	
-	
-	private String createQueryFromParamsTO(FlatSearchParamsTO flatSearchParamsTO){
-		
-		
-		String query="SELECT flat FROM FlatEntity flat WHERE (1=1 AND 2=2 AND 3=3)";
+		BooleanBuilder builder = new BooleanBuilder();
 		
 		if(flatSearchParamsTO.getAreaMin()!=null){
-			query= query.replace("1=1","area>"+ flatSearchParamsTO.getAreaMin());
+		builder.and(flat.area.gt(flatSearchParamsTO.getAreaMin()));
 		}
 		if(flatSearchParamsTO.getAreaMax()!=null){
-			query= query.replace("1=1","area<"+ flatSearchParamsTO.getAreaMax());
+		builder.and(flat.area.lt(flatSearchParamsTO.getAreaMax()));
 		}
 		if(flatSearchParamsTO.getRoomsCountMin()!=null){
-			query= query.replace("2=2","roomsCount>"+ flatSearchParamsTO.getRoomsCountMin());
+			builder.and(flat.area.gt(flatSearchParamsTO.getRoomsCountMin()));
 		}
 		if(flatSearchParamsTO.getRoomsCountMax()!=null){
-			query= query.replace("2=2","roomsCount<"+ flatSearchParamsTO.getRoomsCountMax());
+			builder.and(flat.area.lt(flatSearchParamsTO.getRoomsCountMax()));
 		}
 		if(flatSearchParamsTO.getBalconyCountMin()!=null){
-			query= query.replace("3=3", "balconyCount>"+ flatSearchParamsTO.getBalconyCountMin());
+			builder.and(flat.area.gt(flatSearchParamsTO.getBalconyCountMin()));
 		}
 		if(flatSearchParamsTO.getBalconyCountMax()!=null){
-			query= query.replace("3=3", "balconyCount<"+ flatSearchParamsTO.getBalconyCountMax());
+			builder.and(flat.area.lt(flatSearchParamsTO.getBalconyCountMax()));
 		}
 		
-		return query;
+
+		List<FlatEntity> result = queryFactory.selectFrom(flat).where(builder).fetch();
+		
+		
+		return result;
+		
+
+
 	}
-
-
-
+	
+	
 	@Override
 	public List<FlatEntity> findFlatsDisabledSuitable() {
 
-		TypedQuery<FlatEntity> query = entityManager.createQuery("SELECT flat FROM FlatEntity flat "
-				+ "JOIN flat.building building "
-				+ "WHERE ((building.hasElevator IS true) OR (flat.floorCount=0))",
-				FlatEntity.class);
-		return query.getResultList();
+		
+		QFlatEntity flat = QFlatEntity.flatEntity;
+		
+		JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
+		
+		List<FlatEntity> result = queryFactory
+									.selectFrom(flat)
+									.where((flat.building.hasElevator.isTrue()).or(flat.floorCount.eq(0)))
+									.fetch();
+		
+		
+		return result;
+		
 		
 	}
 
