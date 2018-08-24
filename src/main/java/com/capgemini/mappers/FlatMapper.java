@@ -45,6 +45,10 @@ public class FlatMapper {
 
 	public FlatTO mapToTO(FlatEntity flat) {
 
+		if(flat==null){
+			return null;
+		}
+		
 		return FlatTO.builder().id(flat.getId()).area(flat.getArea()).roomsCount(flat.getRoomsCount())
 				.balconyCount(flat.getBalconyCount()).floorCount(flat.getFloorCount())
 				.location(createCopy(flat.getLocation())).status(flat.getStatus()).price(flat.getPrice())

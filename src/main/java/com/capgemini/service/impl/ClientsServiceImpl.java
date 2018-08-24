@@ -1,5 +1,6 @@
 package com.capgemini.service.impl;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,6 +55,10 @@ public class ClientsServiceImpl implements ClientsService {
 
 		ClientEntity clientEntity = clientDao.findOne(client.getId());
 
+		if(clientEntity==null){
+			return null;
+		}
+		
 		return clientMapper.mapToTO(clientEntity);
 	}
 
@@ -158,20 +163,24 @@ public class ClientsServiceImpl implements ClientsService {
 			throw new CannotPerformActionException("This flat is not even booked!");
 		}
 
-		flatToCancelReservation.getOwner().removeOwnedFlat(flatToCancelReservation);
+		ClientEntity owner = flatToCancelReservation.getOwner();
+		owner.removeOwnedFlat(flatToCancelReservation);
 
-		List<ClientEntity> coOwnersList = flatToCancelReservation.getCoOwners();
-
-		for (ClientEntity coOwner : coOwnersList) {
-			coOwner.removeCoOwnedFlat(flatToCancelReservation);
-		}
+		Iterator<ClientEntity> i = flatToCancelReservation.getCoOwners().iterator();
+		
+		while (i.hasNext()) {
+			   ClientEntity coOwner = i.next(); 
+			   coOwner.removeCoOwnedFlat(flatToCancelReservation);
+			   i.remove();
+			}
+		
 
 		flatToCancelReservation.setStatus(FlatStatus.FREE);
 
 		return flatMapper.mapToTO(flatToCancelReservation);
 
 	}
-
+	//TODO
 	@Override
 	public List<ClientTO> findClientsWhoBoughtFlatsMoreThan(Long flatNumber) {
 

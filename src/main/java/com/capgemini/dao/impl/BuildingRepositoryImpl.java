@@ -6,11 +6,12 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 
-import org.springframework.stereotype.Repository;
-
 import com.capgemini.dao.BuildingRepositoryCustom;
 import com.capgemini.domain.BuildingEntity;
+import com.capgemini.domain.QClientEntity;
+import com.capgemini.domain.QFlatEntity;
 import com.capgemini.domain.enums.FlatStatus;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 
 public class BuildingRepositoryImpl implements BuildingRepositoryCustom {
 
@@ -33,13 +34,27 @@ public class BuildingRepositoryImpl implements BuildingRepositoryCustom {
 
 	@Override
 	public Double countPricesSumOfFlatsBoughtByClient(Long clientId) {
-		//TODO
+		// TODO
+
+		QClientEntity client = QClientEntity.clientEntity;
+		
+		QFlatEntity flatOwned = QFlatEntity.flatEntity;
+		
+		JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
+
+
+
+	
+						
 		TypedQuery<Double> query = entityManager.createQuery("SELECT SUM(flat.price) FROM FlatEntity flat "
-	//			+ "JOIN flat.coOwners coOwner "
-				+ "WHERE (flat.status='SOLD' AND flat.owner.id =:clientId)",
-				Double.class);
+				// + "JOIN flat.coOwners coOwner "
+				+ "WHERE (flat.status='SOLD' AND flat.owner.id =:clientId)", Double.class);
 		query.setParameter("clientId", clientId);
-		return query.getSingleResult();
+		
+		//return query.getSingleResult();
+		
+		return null;
+		
 
 	}
 
@@ -68,13 +83,10 @@ public class BuildingRepositoryImpl implements BuildingRepositoryCustom {
 
 	@Override
 	public List<BuildingEntity> findBuildingsWithMaxmimumNumberFreeFlats() {
-		//TODO
+		// TODO
 		TypedQuery<BuildingEntity> query = entityManager.createQuery(
-				"SELECT building FROM BuildingEntity building " 
-				+ "JOIN building.flats flat ",
-				BuildingEntity.class);
+				"SELECT building FROM BuildingEntity building " + "JOIN building.flats flat ", BuildingEntity.class);
 		return query.getResultList();
-
 
 	}
 

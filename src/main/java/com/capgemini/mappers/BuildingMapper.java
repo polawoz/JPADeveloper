@@ -42,6 +42,10 @@ public class BuildingMapper {
 	}
 
 	public BuildingTO mapToTO(BuildingEntity building) {
+		
+		if(building==null){
+			return null;
+		}
 
 		BuildingTO buildingTO = BuildingTO.builder().id(building.getId()).description(building.getDescription())
 				.location(createCopy(building.getLocation())).storeysNumber(building.getStoreysNumber())

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import com.capgemini.dao.FlatRepositoryCustom;
 import com.capgemini.domain.FlatEntity;
 import com.capgemini.domain.QFlatEntity;
+import com.capgemini.domain.enums.FlatStatus;
 import com.capgemini.types.FlatSearchParamsTO;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -30,24 +31,25 @@ public class FlatRepositoryImpl implements FlatRepositoryCustom {
 		JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
 		
 		BooleanBuilder builder = new BooleanBuilder();
+		builder.and(flat.status.eq(FlatStatus.FREE));
 		
 		if(flatSearchParamsTO.getAreaMin()!=null){
-		builder.and(flat.area.gt(flatSearchParamsTO.getAreaMin()));
+			builder.and(flat.area.goe(flatSearchParamsTO.getAreaMin()));
 		}
 		if(flatSearchParamsTO.getAreaMax()!=null){
-		builder.and(flat.area.lt(flatSearchParamsTO.getAreaMax()));
+			builder.and(flat.area.loe(flatSearchParamsTO.getAreaMax()));
 		}
 		if(flatSearchParamsTO.getRoomsCountMin()!=null){
-			builder.and(flat.area.gt(flatSearchParamsTO.getRoomsCountMin()));
+			builder.and(flat.roomsCount.goe(flatSearchParamsTO.getRoomsCountMin()));
 		}
 		if(flatSearchParamsTO.getRoomsCountMax()!=null){
-			builder.and(flat.area.lt(flatSearchParamsTO.getRoomsCountMax()));
+			builder.and(flat.roomsCount.loe(flatSearchParamsTO.getRoomsCountMax()));
 		}
 		if(flatSearchParamsTO.getBalconyCountMin()!=null){
-			builder.and(flat.area.gt(flatSearchParamsTO.getBalconyCountMin()));
+			builder.and(flat.balconyCount.goe(flatSearchParamsTO.getBalconyCountMin()));
 		}
 		if(flatSearchParamsTO.getBalconyCountMax()!=null){
-			builder.and(flat.area.lt(flatSearchParamsTO.getBalconyCountMax()));
+			builder.and( flat.balconyCount.loe(flatSearchParamsTO.getBalconyCountMax())   );
 		}
 		
 

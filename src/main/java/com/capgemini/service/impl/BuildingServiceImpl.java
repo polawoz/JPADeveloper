@@ -61,9 +61,32 @@ public class BuildingServiceImpl implements BuildingService{
 	
 		return buildingMapper.mapToTO(buildingEntity);
 	}
+	
+	
+	@Override
+	public BuildingTO updateBuilding(BuildingTO building) {
+
+		BuildingEntity buildingToUpdate = buildingDao.findOne(building.getId());
+		
+		if(building.getVersion()!=buildingToUpdate.getVersion()){
+			throw new CannotPerformActionException("Optimistic locking exception!");
+		}
+		
+		return buildingMapper.update(building, buildingToUpdate);
+	}
+	
+	
+	@Override
+	public BuildingTO removeBuilding(BuildingTO building) {
+		
+		buildingDao.delete(building.getId());
+		
+		return building;
+	}
+	
 
 	@Override
-	public List<BuildingTO> findAll() {
+	public List<BuildingTO> findAllBuildings() {
 		
 		List<BuildingEntity> buildingEntityList = buildingDao.findAll();
 		
@@ -102,25 +125,9 @@ public class BuildingServiceImpl implements BuildingService{
 		return flatMapper.update(flat, flatToUpdate);
 	}
 
-	@Override
-	public BuildingTO updateBuilding(BuildingTO building) {
 
-		BuildingEntity buildingToUpdate = buildingDao.findOne(building.getId());
-		
-		if(building.getVersion()!=buildingToUpdate.getVersion()){
-			throw new CannotPerformActionException("Optimistic locking exception!");
-		}
-		
-		return buildingMapper.update(building, buildingToUpdate);
-	}
 
-	@Override
-	public BuildingTO removeBuilding(BuildingTO building) {
-		
-		buildingDao.delete(building.getId());
-		
-		return building;
-	}
+
 
 	@Override
 	public FlatTO removeFlat(FlatTO flat) {
@@ -131,7 +138,7 @@ public class BuildingServiceImpl implements BuildingService{
 		
 		return flat;
 	}
-
+	//TODO
 	@Override
 	public Double countPricesSumOfFlatsBoughtByClient(ClientTO client) {
 		
@@ -158,6 +165,7 @@ public class BuildingServiceImpl implements BuildingService{
 		return buildingDao.countNumberOfFlatsByStatus(flatStatus, buildingId);
 	}
 
+	//TODO
 	@Override
 	public List<BuildingTO> findBuildingsWithMaxmimumNumberFreeFlats() {
 

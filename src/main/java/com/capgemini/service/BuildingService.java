@@ -20,7 +20,7 @@ public interface BuildingService {
 	
 	BuildingTO removeBuilding(BuildingTO building);
 	
-	List<BuildingTO> findAll();
+	List<BuildingTO> findAllBuildings();
 	
 	
 	FlatTO addFlat(FlatTO newFlat, BuildingTO building);

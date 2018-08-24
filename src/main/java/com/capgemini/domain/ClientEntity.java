@@ -73,7 +73,6 @@ public class ClientEntity extends AbstractEntity implements Serializable {
 	
 	public void removeCoOwnedFlat(FlatEntity flat){
 		flatsCoOwned.remove(flat);
-		flat.getCoOwners().remove(this);
 	}
 	
 	
