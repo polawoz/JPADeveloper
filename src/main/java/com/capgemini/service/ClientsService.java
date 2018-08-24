@@ -24,6 +24,8 @@ public interface ClientsService {
 	
 	FlatTO cancelReservation(FlatTO flat);
 	
+	List<ClientTO> findClientsWhoBoughtFlatsMoreThan(Long flatNumber);
 	
+	List<FlatTO> findFlatsDisabledSuitable();
 
 }

@@ -11,12 +11,14 @@ import com.capgemini.dao.BuildingRepository;
 import com.capgemini.dao.FlatRepository;
 import com.capgemini.domain.BuildingEntity;
 import com.capgemini.domain.FlatEntity;
+import com.capgemini.domain.enums.FlatStatus;
 import com.capgemini.exception.CannotPerformActionException;
 import com.capgemini.mappers.BuildingMapper;
 import com.capgemini.mappers.FlatMapper;
 import com.capgemini.service.BuildingService;
 import com.capgemini.types.BuildingTO;
 import com.capgemini.types.ClientTO;
+import com.capgemini.types.FlatSearchParamsTO;
 import com.capgemini.types.FlatTO;
 
 @Service
@@ -124,6 +126,8 @@ public class BuildingServiceImpl implements BuildingService{
 	public FlatTO removeFlat(FlatTO flat) {
 
 		flatDao.delete(flat.getId());
+		Integer beforeDeleteFlatCount = buildingDao.findOne(flat.getBuildingId()).getFlatCount();
+		buildingDao.findOne(flat.getBuildingId()).setFlatCount(beforeDeleteFlatCount-1);
 		
 		return flat;
 	}
@@ -138,6 +142,29 @@ public class BuildingServiceImpl implements BuildingService{
 	public Double countAveragePriceOfFlatInTheBuilding(BuildingTO building) {
 		
 		return buildingDao.countAveragePriceOfFlatInTheBuilding(building.getId());
+	}
+
+	@Override
+	public List<FlatTO> findUnsoldFlatsByCriteria(FlatSearchParamsTO flatSearchParamsTO) {
+		List<FlatEntity> foundFlats = flatDao.findUnsoldFlatsByCriteria(flatSearchParamsTO);
+
+		
+		return flatMapper.mapToTOList(foundFlats);
+	}
+
+	@Override
+	public Long countNumberOfFlatsByStatus(FlatStatus flatStatus, Long buildingId) {
+		
+		return buildingDao.countNumberOfFlatsByStatus(flatStatus, buildingId);
+	}
+
+	@Override
+	public List<BuildingTO> findBuildingsWithMaxmimumNumberFreeFlats() {
+
+		List<BuildingEntity> foundBuildings = buildingDao.findBuildingsWithMaxmimumNumberFreeFlats();
+		
+		
+		return buildingMapper.mapToTOList(foundBuildings);
 	}
 	
 	

@@ -337,4 +337,333 @@ public class ClientsServiceTest {
 	
 	
 
+	//@Test
+	public void testShouldFindClientsWhoBoughtFlatsMoreThan(){
+		
+		
+		//given
+		
+		int foundClientListBeforeSize = clientsService.findClientsWhoBoughtFlatsMoreThan(1L).size();
+		
+		//Building
+		BuildingTO buildingToAdd = BuildingTO.builder()
+				.description("Nowy budynek")
+				.location(new Address())
+				.storeysNumber(1)
+				.hasElevator(false)
+				.flatCount(0)
+				.build();
+		
+		BuildingTO savedBuilding = buildingService.addBuilding(buildingToAdd);
+		
+		//Flat 1
+		FlatTO flatToAdd = FlatTO.builder()
+				.area(30D)
+				.roomsCount(2)
+				.balconyCount(0)
+				.floorCount(2)
+				.location(new Address())
+				.status(FlatStatus.FREE)
+				.price(30000D)
+				.build();
+		
+		FlatTO savedFlat = buildingService.addFlat(flatToAdd, savedBuilding);
+		
+		//Flat 2
+		//Flat
+		FlatTO secondFlatToAdd = FlatTO.builder()
+				.area(30D)
+				.roomsCount(2)
+				.balconyCount(0)
+				.floorCount(2)
+				.location(new Address())
+				.status(FlatStatus.FREE)
+				.price(25000D)
+				.build();
+		
+		FlatTO secondSavedFlat = buildingService.addFlat(secondFlatToAdd, savedBuilding);
+		
+	
+		//Owner client
+		ClientTO clientToAdd = ClientTO.builder()
+				.lastName("Kowalski")
+				.firstName("Andrzej")
+				.address(new Address())
+				.phoneNumber("3232323")
+				.eMail("a.kowalski@gmail.com")
+				.dateOfBirth(Date.valueOf("1980-09-21"))
+				.build();
+		
+		ClientTO savedClient = clientsService.addClient(clientToAdd);
+		
+		
+		List<ClientTO> coOwnersList = new ArrayList<>();
+		
+		FlatTO boughtFlat = clientsService.buyFlat(savedFlat, savedClient, coOwnersList);
+		FlatTO secondBoughtFlat = clientsService.buyFlat(secondSavedFlat, savedClient, coOwnersList);
+		
+		
+		
+		
+		
+		//when
+		List<ClientTO> foundClients = clientsService.findClientsWhoBoughtFlatsMoreThan(1L);
+		
+		
+		
+		
+		
+		//then
+		assertEquals(foundClientListBeforeSize+2, foundClients.size());
+		
+		
+		
+		
+		
+		
+		
+		
+	}
+	
+	
+	
+	
+	//@Test
+	public void testShouldCountTheSumOfFlatsBoughtByClientCoOwnershipIncluded(){
+		
+		
+		//given
+		//Building
+		BuildingTO buildingToAdd = BuildingTO.builder()
+				.description("Nowy budynek")
+				.location(new Address())
+				.storeysNumber(1)
+				.hasElevator(false)
+				.flatCount(0)
+				.build();
+		
+		BuildingTO savedBuilding = buildingService.addBuilding(buildingToAdd);
+		
+		//Flat 1
+		FlatTO flatToAdd = FlatTO.builder()
+				.area(30D)
+				.roomsCount(2)
+				.balconyCount(0)
+				.floorCount(2)
+				.location(new Address())
+				.status(FlatStatus.FREE)
+				.price(30000D)
+				.build();
+		
+		FlatTO savedFlat = buildingService.addFlat(flatToAdd, savedBuilding);
+		
+		//Flat 2
+		//Flat
+		FlatTO secondFlatToAdd = FlatTO.builder()
+				.area(30D)
+				.roomsCount(2)
+				.balconyCount(0)
+				.floorCount(2)
+				.location(new Address())
+				.status(FlatStatus.FREE)
+				.price(25000D)
+				.build();
+		
+		FlatTO secondSavedFlat = buildingService.addFlat(secondFlatToAdd, savedBuilding);
+		
+	
+		//Owner client
+		ClientTO clientToAdd = ClientTO.builder()
+				.lastName("Kowalski")
+				.firstName("Andrzej")
+				.address(new Address())
+				.phoneNumber("3232323")
+				.eMail("a.kowalski@gmail.com")
+				.dateOfBirth(Date.valueOf("1980-09-21"))
+				.build();
+		
+		ClientTO savedClient = clientsService.addClient(clientToAdd);
+		
+		
+		ClientTO otherOwnerSavedClient = clientsService.addClient(ClientTO.builder()
+				.lastName("Kowalski")
+				.firstName("Jan")
+				.address(new Address())
+				.phoneNumber("3232323")
+				.eMail("j.kowalski@gmail.com")
+				.dateOfBirth(Date.valueOf("1980-09-21"))
+				.build());
+		
+
+		
+		List<ClientTO> coOwnersList = new ArrayList<>();
+		
+		FlatTO boughtFlat = clientsService.buyFlat(savedFlat, savedClient, coOwnersList);
+		
+		List<ClientTO> secondCoOwnersList = new ArrayList<>();
+		secondCoOwnersList.add(savedClient);
+		
+		FlatTO secondBoughtFlat = clientsService.buyFlat(secondSavedFlat, otherOwnerSavedClient, secondCoOwnersList);
+		
+		
+		
+		
+	
+		
+		
+		
+		
+		
+		
+		
+		//Reservation making
+		
+		BuildingTO buildingToAddR = BuildingTO.builder()
+				.description("Nowy budynek")
+				.location(new Address())
+				.storeysNumber(1)
+				.hasElevator(false)
+				.flatCount(0)
+				.build();
+		
+		BuildingTO savedBuildingR = buildingService.addBuilding(buildingToAddR);
+		
+		//Flat
+		FlatTO flatToAddR = FlatTO.builder()
+				.area(30D)
+				.roomsCount(2)
+				.balconyCount(0)
+				.floorCount(2)
+				.location(new Address())
+				.status(FlatStatus.FREE)
+				.price(70000D)
+				.build();
+		
+		FlatTO savedFlatR = buildingService.addFlat(flatToAddR, savedBuildingR);
+		
+		
+	
+		//Owner client
+	
+		
+		//CoOwner client
+		ClientTO clientToAddCoOwnerR = ClientTO.builder()
+				.lastName("Kowalska")
+				.firstName("Janina")
+				.address(new Address())
+				.phoneNumber("3232323")
+				.eMail("j.kowalska@gmail.com")
+				.dateOfBirth(Date.valueOf("1980-09-21"))
+				.build();
+		
+		ClientTO savedClientCoOwnerR = clientsService.addClient(clientToAddCoOwnerR);		
+	
+		List<ClientTO> coOwnersListR = new ArrayList<>();
+		coOwnersList.add(savedClientCoOwnerR);
+		
+		FlatTO flatTOR = clientsService.makeReservation(savedFlatR, savedClient, coOwnersListR);
+		
+		
+		
+		//when
+		Double pricesSum = buildingService.countPricesSumOfFlatsBoughtByClient(savedClient);
+		
+		//then
+		assertEquals(new Double(55000), pricesSum);
+		
+	}
+	
+	
+	@Test
+	public void testShoudlFindFlatsDisabledSuitable(){
+		
+		
+		//given
+		
+		
+		int foundFlatsListSizeBefore = clientsService.findFlatsDisabledSuitable().size();
+		
+		BuildingTO buildingToAdd = BuildingTO.builder()
+				.description("Nowy budynek")
+				.location(new Address())
+				.storeysNumber(3)
+				.hasElevator(false)
+				.flatCount(0)
+				.build();
+		
+		BuildingTO savedBuilding = buildingService.addBuilding(buildingToAdd);
+		
+		//Flat 1
+		FlatTO flatToAdd = FlatTO.builder()
+				.area(30D)
+				.roomsCount(2)
+				.balconyCount(0)
+				.floorCount(0)
+				.location(new Address())
+				.status(FlatStatus.FREE)
+				.price(30000D)
+				.build();
+		
+		FlatTO savedFlat = buildingService.addFlat(flatToAdd, savedBuilding);
+		
+		//Flat 2
+		//Flat
+		FlatTO secondFlatToAdd = FlatTO.builder()
+				.area(30D)
+				.roomsCount(2)
+				.balconyCount(0)
+				.floorCount(2)
+				.location(new Address())
+				.status(FlatStatus.FREE)
+				.price(25000D)
+				.build();
+		
+		FlatTO secondSavedFlat = buildingService.addFlat(secondFlatToAdd, savedBuilding);
+		
+		
+		//Second building
+		BuildingTO anotherBuildingToAdd = BuildingTO.builder()
+				.description("Nowy budynek")
+				.location(new Address())
+				.storeysNumber(4)
+				.hasElevator(true)
+				.flatCount(0)
+				.build();
+		
+		BuildingTO anotherSavedBuilding = buildingService.addBuilding(anotherBuildingToAdd);
+		
+		//Flat 1
+		FlatTO anotherFlatToAdd = FlatTO.builder()
+				.area(30D)
+				.roomsCount(2)
+				.balconyCount(0)
+				.floorCount(3)
+				.location(new Address())
+				.status(FlatStatus.FREE)
+				.price(30000D)
+				.build();
+		
+		FlatTO anotherSavedFlat = buildingService.addFlat(anotherFlatToAdd, anotherSavedBuilding);
+
+		
+		//when
+		List<FlatTO> foundFlats = clientsService.findFlatsDisabledSuitable();
+		
+		
+		//then
+		assertEquals(foundFlatsListSizeBefore+2, foundFlats.size());
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	}
+	
+	
+
 }

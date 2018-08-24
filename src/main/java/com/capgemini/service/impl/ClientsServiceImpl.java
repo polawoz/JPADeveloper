@@ -33,7 +33,8 @@ public class ClientsServiceImpl implements ClientsService {
 	private FlatMapper flatMapper;
 
 	@Autowired
-	public ClientsServiceImpl(ClientRepository clientDao, ClientMapper clientMapper, FlatRepository flatDao, FlatMapper flatMapper) {
+	public ClientsServiceImpl(ClientRepository clientDao, ClientMapper clientMapper, FlatRepository flatDao,
+			FlatMapper flatMapper) {
 		this.clientDao = clientDao;
 		this.clientMapper = clientMapper;
 		this.flatDao = flatDao;
@@ -79,7 +80,6 @@ public class ClientsServiceImpl implements ClientsService {
 
 		ownerEntity.addOwnedFlat(flatEntity);
 
-		
 		for (ClientTO coOwner : coOwners) {
 			ClientEntity client = clientDao.findOne(coOwner.getId());
 			if (client != null) {
@@ -94,13 +94,13 @@ public class ClientsServiceImpl implements ClientsService {
 
 	@Override
 	public FlatTO buyFlatAfterReservation(FlatTO flat, ClientTO client) {
-		
+
 		FlatEntity flatEntity = flatDao.findOne(flat.getId());
-		
-		if(flatEntity.getStatus()!=FlatStatus.BOOKED){
+
+		if (flatEntity.getStatus() != FlatStatus.BOOKED) {
 			throw new CannotPerformActionException("This flat is not booked!");
 		}
-		if(flatEntity.getOwner().getId()!=client.getId()){
+		if (flatEntity.getOwner().getId() != client.getId()) {
 			throw new CannotPerformActionException("This flat can be bought only by the client who booked it!");
 		}
 
@@ -170,6 +170,22 @@ public class ClientsServiceImpl implements ClientsService {
 
 		return flatMapper.mapToTO(flatToCancelReservation);
 
+	}
+
+	@Override
+	public List<ClientTO> findClientsWhoBoughtFlatsMoreThan(Long flatNumber) {
+
+		List<ClientEntity> foundClients = clientDao.findClientsWhoBoughtFlatsMoreThan(flatNumber);
+
+		return clientMapper.mapToTOList(foundClients);
+	}
+
+	@Override
+	public List<FlatTO> findFlatsDisabledSuitable() {
+
+		List<FlatEntity> foundFlats = flatDao.findFlatsDisabledSuitable();
+		
+		return flatMapper.mapToTOList(foundFlats);
 	}
 
 }
