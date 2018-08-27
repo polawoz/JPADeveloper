@@ -22,7 +22,7 @@ public class BuildingMapper {
 		BuildingEntity newEntity = BuildingEntity.builder().description(newBuilding.getDescription())
 				.location(createCopy(newBuilding.getLocation())).storeysNumber(newBuilding.getStoreysNumber())
 				.hasElevator(newBuilding.getHasElevator()).flatCount(newBuilding.getFlatCount())
-				.flats(newBuilding.getFlats() == null ? new ArrayList<FlatEntity>() : new ArrayList<FlatEntity>())
+				.flats(new ArrayList<FlatEntity>())
 				.build();
 
 		newEntity.setVersion(newBuilding.getVersion());

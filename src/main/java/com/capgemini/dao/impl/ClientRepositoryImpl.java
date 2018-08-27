@@ -11,7 +11,12 @@ import com.capgemini.domain.ClientEntity;
 import com.capgemini.domain.QClientEntity;
 import com.capgemini.domain.QFlatEntity;
 import com.capgemini.domain.enums.FlatStatus;
+import com.mysema.query.jpa.impl.JPASubQuery;
+import com.mysema.query.types.EntityPath;
+import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+
 
 public class ClientRepositoryImpl implements ClientRepositoryCustom {
 
@@ -25,25 +30,31 @@ public class ClientRepositoryImpl implements ClientRepositoryCustom {
 		
 		QClientEntity client = QClientEntity.clientEntity;
 		
-		QFlatEntity flatOwned = QFlatEntity.flatEntity;
+		QClientEntity cO = new QClientEntity("cO");
 		
-		QFlatEntity flatCoOwned = QFlatEntity.flatEntity;
-
+		QFlatEntity flat = QFlatEntity.flatEntity;
+		
+		
+		
 		JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
 		
 		
-		
 		List<ClientEntity> result = queryFactory
-									.selectFrom(client).join(client.flatsOwned, flatOwned)
-									.join(client.flatsCoOwned, flatCoOwned)
-									.where(flatOwned.status.eq(FlatStatus.SOLD).or(flatCoOwned.status.eq(FlatStatus.SOLD)))
-									.fetch();
-		
+									.selectFrom(client)
+									.where(JPAExpressions.select(flat.count()).from(flat).leftJoin(flat.coOwners,cO)
+											.where(flat.status.eq(FlatStatus.SOLD).and(flat.owner.eq(client).or(cO.eq(client)))).gt(flatNumber)
+											).fetch();
+
 		
 		TypedQuery<ClientEntity> query = entityManager.createQuery("SELECT client FROM ClientEntity client "
-				+ "JOIN client.flatsOwned flatOwned JOIN client.flatsCoOwned flatCoOwned "
-				+ "WHERE ((flatOwned.status='SOLD' OR flatCoOwned.status='SOLD'))", ClientEntity.class);
-		// query.setParameter("boughtFlatsNumber", flatNumber);
+				+ "WHERE ("
+					+ "SELECT count(flat) from FlatEntity flat left join flat.coOwners coOwner "
+					+ "WHERE (flat.status= 'SOLD' AND (flat.owner=client OR coOwner=client)) )"
+				+ ">:boughtFlatsNumber ",
+		 ClientEntity.class);
+		
+		
+		 query.setParameter("boughtFlatsNumber", flatNumber);
 
 	
 
@@ -51,9 +62,10 @@ public class ClientRepositoryImpl implements ClientRepositoryCustom {
 		
 		
 		
-		return query.getResultList();
+	//return query.getResultList();
 
-	//	return result;
+		return result;
+	
 	}
 
 }

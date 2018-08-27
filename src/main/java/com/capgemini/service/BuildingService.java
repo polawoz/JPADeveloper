@@ -44,7 +44,7 @@ public interface BuildingService {
 	
 	List<BuildingTO> findBuildingsWithMaxmimumNumberFreeFlats();
 	
-	
+	Long countFreeFlatFromBuilding(BuildingTO building);
 	
 	
 	

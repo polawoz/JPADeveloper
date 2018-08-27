@@ -49,9 +49,8 @@ public class FlatRepositoryImpl implements FlatRepositoryCustom {
 			builder.and(flat.balconyCount.goe(flatSearchParamsTO.getBalconyCountMin()));
 		}
 		if(flatSearchParamsTO.getBalconyCountMax()!=null){
-			builder.and( flat.balconyCount.loe(flatSearchParamsTO.getBalconyCountMax())   );
+			builder.and(flat.balconyCount.loe(flatSearchParamsTO.getBalconyCountMax())   );
 		}
-		
 
 		List<FlatEntity> result = queryFactory.selectFrom(flat).where(builder).fetch();
 		

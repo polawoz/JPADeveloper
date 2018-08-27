@@ -231,6 +231,7 @@ public class BuildingServiceTest {
 		assertEquals(flatToAdd.getBalconyCount(), foundFlat.getBalconyCount());
 		assertTrue(foundBuilding.getFlats().stream().anyMatch(b->b.equals(savedFlat.getId())));
 		assertTrue(foundFlat.getBuildingId().equals(savedBuilding.getId()));
+		assertEquals(1, foundBuilding.getFlatCount().longValue());
 		
 	}
 	
@@ -348,6 +349,7 @@ public class BuildingServiceTest {
 		BuildingTO foundBuilding = buildingService.findBuildingById(savedBuilding);
 		assertNull(foundFlat);
 		assertTrue(foundBuilding.getFlats().stream().noneMatch(b->b.equals(savedFlat.getId())));
+		assertEquals(0, foundBuilding.getFlatCount().longValue());
 		
 		
 		
@@ -429,80 +431,63 @@ public class BuildingServiceTest {
 
 	}
 
-
+	//@Test
+	public void testShouldCountNumberOfFreeFlatsForBuilding(){
+		
+		
+		
+		BuildingTO buildingToAdd = createTestBuilding();
+		BuildingTO savedBuilding = buildingService.addBuilding(buildingToAdd);
+	
+		
+		FlatTO firstFlatToAdd = createTestFlat();
+		FlatTO savedFlat = buildingService.addFlat(firstFlatToAdd, savedBuilding);
+		
+		Long numberOfFreeFlatsBefore = buildingService.countFreeFlatFromBuilding(savedBuilding);
+		
+		FlatTO secondFlatToAdd = createTestFlat();
+		FlatTO secondSavedFlat = buildingService.addFlat(secondFlatToAdd, savedBuilding);
+		
+		//Second building
+		BuildingTO secondBuildingToAdd = createTestBuilding();
+		BuildingTO secondSavedBuilding = buildingService.addBuilding(secondBuildingToAdd);
+		
+		FlatTO secondBuildingFlatToAdd = createTestFlat();
+		FlatTO secondBuildingSavedFlat = buildingService.addFlat(secondBuildingFlatToAdd, secondSavedBuilding);
+		
+		
+		//when
+		Long numberOfFreeFlats = buildingService.countFreeFlatFromBuilding(savedBuilding);
+		
+		//then
+		assertEquals(numberOfFreeFlatsBefore.longValue()+1L, numberOfFreeFlats.longValue());
+		
+		
+		
+	}
 	
 	
-	@Test
+	//@Test
 	public void testShouldFindBuildingsWithMaxmimumNumberFreeFlats(){
 		
 		//given
-		
 		int foundBuildingsListBeforeSize = buildingService.findBuildingsWithMaxmimumNumberFreeFlats().size();
-		
-		BuildingTO buildingToAdd = BuildingTO.builder()
-				.description("Nowy budynek")
-				.location(new Address())
-				.storeysNumber(3)
-				.hasElevator(false)
-				.flatCount(0)
-				.build();
-		
+		//Building 1
+		BuildingTO buildingToAdd = createTestBuilding();
 		BuildingTO savedBuilding = buildingService.addBuilding(buildingToAdd);
-		
 		//Flat 1
-		FlatTO flatToAdd = FlatTO.builder()
-				.area(30D)
-				.roomsCount(2)
-				.balconyCount(0)
-				.floorCount(0)
-				.location(new Address())
-				.status(FlatStatus.FREE)
-				.price(30000D)
-				.build();
-		
+		FlatTO flatToAdd = createTestFlat();
 		FlatTO savedFlat = buildingService.addFlat(flatToAdd, savedBuilding);
-		
 		//Flat 2
-		//Flat
-		FlatTO secondFlatToAdd = FlatTO.builder()
-				.area(30D)
-				.roomsCount(2)
-				.balconyCount(0)
-				.floorCount(2)
-				.location(new Address())
-				.status(FlatStatus.FREE)
-				.price(25000D)
-				.build();
-		
+		FlatTO secondFlatToAdd = createTestFlat();
 		FlatTO secondSavedFlat = buildingService.addFlat(secondFlatToAdd, savedBuilding);
 		
-		
-		
-		BuildingTO anotherBuildingToAdd = BuildingTO.builder()
-				.description("Nowy budynek")
-				.location(new Address())
-				.storeysNumber(4)
-				.hasElevator(true)
-				.flatCount(0)
-				.build();
-		
+		//Building 2
+		BuildingTO anotherBuildingToAdd = createTestBuilding();
 		BuildingTO anotherSavedBuilding = buildingService.addBuilding(anotherBuildingToAdd);
-		
 		//Flat 1
-		FlatTO anotherFlatToAdd = FlatTO.builder()
-				.area(30D)
-				.roomsCount(2)
-				.balconyCount(0)
-				.floorCount(3)
-				.location(new Address())
-				.status(FlatStatus.FREE)
-				.price(30000D)
-				.build();
-		
+		FlatTO anotherFlatToAdd = createTestFlat();
 		FlatTO anotherSavedFlat = buildingService.addFlat(anotherFlatToAdd, anotherSavedBuilding);
-		
-		
-		
 		
 		
 		//when
@@ -518,6 +503,9 @@ public class BuildingServiceTest {
 		
 		
 	}
+	
+	
+	
 	
 	
 	

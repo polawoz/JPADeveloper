@@ -96,8 +96,14 @@ public class BuildingServiceImpl implements BuildingService{
 
 	@Override
 	public FlatTO addFlat(FlatTO newFlat, BuildingTO building) {
-
+		
+		
+		
+		
 		BuildingEntity foundBuilding = buildingDao.findOne(building.getId());
+		if(foundBuilding==null){
+			throw new CannotPerformActionException("There is no building with that id!");
+		}
 		FlatEntity flatEntity= flatMapper.mapToEntity(newFlat);
 		foundBuilding.addFlat(flatEntity);
 		FlatEntity savedFlat = flatDao.save(flatEntity);
@@ -173,6 +179,16 @@ public class BuildingServiceImpl implements BuildingService{
 		
 		
 		return buildingMapper.mapToTOList(foundBuildings);
+	}
+
+	@Override
+	public Long countFreeFlatFromBuilding(BuildingTO building) {
+
+
+		
+		
+		
+		return buildingDao.countFreeFlatFromBuilding(building.getId());
 	}
 	
 	
