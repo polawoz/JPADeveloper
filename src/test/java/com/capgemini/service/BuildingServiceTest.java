@@ -1,6 +1,9 @@
 package com.capgemini.service;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
@@ -29,6 +32,7 @@ public class BuildingServiceTest {
 
 		// given
 		BuildingTO buildingToAdd = createTestBuilding();
+		buildingToAdd.setDescription("Opis");
 		int buildingsListSizeBefore = buildingService.findAllBuildings().size();
 
 		// when
@@ -39,53 +43,49 @@ public class BuildingServiceTest {
 		assertEquals(buildingsListSizeBefore + 1, buildingService.findAllBuildings().size());
 
 	}
-	
-	
+
 	@Test
 	public void testShouldFindBuildingById() {
 
 		// given
 		BuildingTO buildingToAdd = createTestBuilding();
+		buildingToAdd.setDescription("Opis");
 		BuildingTO addedBuilding = buildingService.addBuilding(buildingToAdd);
 
-		//when
+		// when
 		BuildingTO foundBuilding = buildingService.findBuildingById(addedBuilding);
-		
-		//then
+
+		// then
 		assertNotNull(foundBuilding);
 		assertEquals(addedBuilding.getId(), foundBuilding.getId());
 		assertEquals(addedBuilding.getDescription(), foundBuilding.getDescription());
-	
 
 	}
-	
-	
+
 	@Test
 	public void testShouldFindAllBuildings() {
 
 		// given
 		int foundBuildingsListSizeBefore = buildingService.findAllBuildings().size();
-		
-		BuildingTO buildingToAdd = createTestBuilding();
-		BuildingTO addedBuilding = buildingService.addBuilding(buildingToAdd);
-		
-		BuildingTO secondBuildingToAdd = createTestBuilding();
-		BuildingTO secondAddedBuilding = buildingService.addBuilding(secondBuildingToAdd);
-		
-		BuildingTO thirdBuildingToAdd = createTestBuilding();
-		BuildingTO thirdAddedBuilding = buildingService.addBuilding(thirdBuildingToAdd);
 
-		//when
+		BuildingTO buildingToAdd = createTestBuilding();
+		buildingService.addBuilding(buildingToAdd);
+
+		BuildingTO secondBuildingToAdd = createTestBuilding();
+		buildingService.addBuilding(secondBuildingToAdd);
+
+		BuildingTO thirdBuildingToAdd = createTestBuilding();
+		buildingService.addBuilding(thirdBuildingToAdd);
+
+		// when
 		List<BuildingTO> foundBuildings = buildingService.findAllBuildings();
-		
-		//then
+
+		// then
 		assertNotNull(foundBuildings);
-		assertEquals(foundBuildingsListSizeBefore+3, foundBuildings.size());
-	
+		assertEquals(foundBuildingsListSizeBefore + 3, foundBuildings.size());
 
 	}
-	
-	
+
 	@Test
 	public void testShouldUpdateBuildingStoreysNumber() {
 
@@ -96,24 +96,20 @@ public class BuildingServiceTest {
 		buildingToAdd.setStoreysNumber(1);
 		BuildingTO savedBuilding = buildingService.addBuilding(buildingToAdd);
 
-		BuildingTO updateParameters = BuildingTO.builder().id(savedBuilding.getId())
-				.storeysNumber(4).version(savedBuilding.getVersion()).build();
+		BuildingTO updateParameters = BuildingTO.builder().id(savedBuilding.getId()).storeysNumber(4)
+				.version(savedBuilding.getVersion()).build();
 
-		
 		// when
 		BuildingTO updatedBuilding = buildingService.updateBuilding(updateParameters);
-	
 
 		// then
 
 		BuildingTO buildingAfterUpdate = buildingService.findBuildingById(savedBuilding);
 		assertEquals(updateParameters.getStoreysNumber(), updatedBuilding.getStoreysNumber());
-		assertEquals(savedBuilding.getVersion().longValue()+1,buildingAfterUpdate.getVersion().longValue());
-	
+		assertEquals(savedBuilding.getVersion().longValue() + 1, buildingAfterUpdate.getVersion().longValue());
+
 	}
-	
-	
-	
+
 	@Test
 	public void testShouldNotUpdateBuildingStoreysNumberOptimisticLocking() {
 
@@ -135,12 +131,10 @@ public class BuildingServiceTest {
 
 		boolean exceptionThrown = false;
 		// when
-
-		// drugi zmieni liczbe pieter na 10
 		BuildingTO updatedBuildingSecondUser = buildingService.updateBuilding(updateParametersSecondUser);
-		// pierwszy nie zmieni
+
 		try {
-			BuildingTO updatedBuildingFirstUser = buildingService.updateBuilding(updateParametersFirstUser);
+			buildingService.updateBuilding(updateParametersFirstUser);
 		} catch (CannotPerformActionException e) {
 			exceptionThrown = true;
 			e.printStackTrace();
@@ -154,35 +148,27 @@ public class BuildingServiceTest {
 		assertEquals(updateParametersSecondUser.getStoreysNumber(), buildingAfterBothUpdates.getStoreysNumber());
 
 	}
-	
-	
-	
+
 	@Test
-	public void testShouldRemoveBuilding(){
-		
-		//given
+	public void testShouldRemoveBuilding() {
+
+		// given
 		BuildingTO buildingToAdd = createTestBuilding();
 		buildingToAdd.setStoreysNumber(1);
 		BuildingTO savedBuilding = buildingService.addBuilding(buildingToAdd);
 
-		
-		//when
-		BuildingTO removedBuilding = buildingService.removeBuilding(savedBuilding);
-		
-		
-		//then
+		// when
+		buildingService.removeBuilding(savedBuilding);
+
+		// then
 		BuildingTO foundBuilding = buildingService.findBuildingById(savedBuilding);
 		assertNull(foundBuilding);
-		
-		
-		
+
 	}
-	
-	
+
 	@Test
-	public void testShouldRemoveBuildingAndItsFlatsCascade(){
-		
-	
+	public void testShouldRemoveBuildingAndItsFlatsCascade() {
+
 		// Building
 		BuildingTO buildingToAdd = createTestBuilding();
 		BuildingTO savedBuilding = buildingService.addBuilding(buildingToAdd);
@@ -194,68 +180,63 @@ public class BuildingServiceTest {
 		FlatTO secondFlatToAdd = createTestFlat();
 		FlatTO secondSavedFlat = buildingService.addFlat(secondFlatToAdd, savedBuilding);
 
-		//when
-		BuildingTO removedBuilding = buildingService.removeBuilding(savedBuilding);
-		
-		//then
+		// when
+		buildingService.removeBuilding(savedBuilding);
+
+		// then
 		BuildingTO foundBuilding = buildingService.findBuildingById(savedBuilding);
 		FlatTO foundFlatFirst = buildingService.findFlatById(savedFlat);
 		FlatTO foundFlatSecond = buildingService.findFlatById(secondSavedFlat);
 		assertNull(foundBuilding);
 		assertNull(foundFlatFirst);
 		assertNull(foundFlatSecond);
-		
-		
-		
-		
-		
-		
+
 	}
-	
-	
+
 	@Test
-	public void testShouldAddFlat(){
-		
-		//given
+	public void testShouldAddFlat() {
+
+		// given
 		BuildingTO buildingToAdd = createTestBuilding();
 		BuildingTO savedBuilding = buildingService.addBuilding(buildingToAdd);
 		FlatTO flatToAdd = createTestFlat();
-		
-		//when
+		flatToAdd.setBalconyCount(29);
+
+		// when
 		FlatTO savedFlat = buildingService.addFlat(flatToAdd, savedBuilding);
-		
-		//then
+
+		// then
 		FlatTO foundFlat = buildingService.findFlatById(savedFlat);
 		BuildingTO foundBuilding = buildingService.findBuildingById(savedBuilding);
 		assertNotNull(foundFlat);
 		assertEquals(flatToAdd.getBalconyCount(), foundFlat.getBalconyCount());
-		assertTrue(foundBuilding.getFlats().stream().anyMatch(b->b.equals(savedFlat.getId())));
+		assertTrue(foundBuilding.getFlats().stream().anyMatch(b -> b.equals(savedFlat.getId())));
 		assertTrue(foundFlat.getBuildingId().equals(savedBuilding.getId()));
 		assertEquals(1, foundBuilding.getFlatCount().longValue());
-		
+
 	}
-	
+
 	@Test
-	public void testFindFlatById(){
-		
-		//given
-		
+	public void testFindFlatById() {
+
+		// given
+
 		BuildingTO buildingToAdd = createTestBuilding();
 		BuildingTO savedBuilding = buildingService.addBuilding(buildingToAdd);
 		FlatTO flatToAdd = createTestFlat();
+		flatToAdd.setBalconyCount(29);
 		FlatTO savedFlat = buildingService.addFlat(flatToAdd, savedBuilding);
-		
-		//when
+
+		// when
 		FlatTO foundFlat = buildingService.findFlatById(savedFlat);
-		
-		//then
+
+		// then
 		assertNotNull(foundFlat);
 		assertEquals(savedFlat.getId(), foundFlat.getId());
 		assertEquals(savedFlat.getBalconyCount(), foundFlat.getBalconyCount());
-		
+
 	}
-	
-	
+
 	@Test
 	public void testShouldUpdateFlatFloorCount() {
 
@@ -270,15 +251,11 @@ public class BuildingServiceTest {
 		flatToAdd.setFloorCount(2);
 		FlatTO savedFlat = buildingService.addFlat(flatToAdd, savedBuilding);
 
-		FlatTO updateParameters = FlatTO.builder()
-				.id(savedFlat.getId())
-				.floorCount(3)
-				.version(savedFlat.getVersion())
+		FlatTO updateParameters = FlatTO.builder().id(savedFlat.getId()).floorCount(3).version(savedFlat.getVersion())
 				.build();
 
 		// when
 		FlatTO updatedFlat = buildingService.updateFlat(updateParameters);
-		
 
 		// then
 		FlatTO foundFlatAfterUpdate = buildingService.findFlatById(updatedFlat);
@@ -311,12 +288,10 @@ public class BuildingServiceTest {
 
 		boolean exceptionThrown = false;
 		// when
-
-		// drugi zmieni liczbe pieter na 7
 		FlatTO updatedFlatSecondUser = buildingService.updateFlat(updateParametersSecondUser);
-		// pierwszy nie zmieni
+
 		try {
-			FlatTO updatedFlatFirstUser = buildingService.updateFlat(updateParametersFirstUser);
+			buildingService.updateFlat(updateParametersFirstUser);
 		} catch (CannotPerformActionException e) {
 			exceptionThrown = true;
 			e.printStackTrace();
@@ -331,33 +306,27 @@ public class BuildingServiceTest {
 
 	}
 
-
 	@Test
-	public void testShouldRemoveFlat(){
-		
-		//given
+	public void testShouldRemoveFlat() {
+
+		// given
 		BuildingTO buildingToAdd = createTestBuilding();
 		BuildingTO savedBuilding = buildingService.addBuilding(buildingToAdd);
 		FlatTO flatToAdd = createTestFlat();
 		FlatTO savedFlat = buildingService.addFlat(flatToAdd, savedBuilding);
-		
-		//when
-		FlatTO removedFlat = buildingService.removeFlat(savedFlat);
-		
-		//then
+
+		// when
+		buildingService.removeFlat(savedFlat);
+
+		// then
 		FlatTO foundFlat = buildingService.findFlatById(savedFlat);
 		BuildingTO foundBuilding = buildingService.findBuildingById(savedBuilding);
 		assertNull(foundFlat);
-		assertTrue(foundBuilding.getFlats().stream().noneMatch(b->b.equals(savedFlat.getId())));
+		assertTrue(foundBuilding.getFlats().stream().noneMatch(b -> b.equals(savedFlat.getId())));
 		assertEquals(0, foundBuilding.getFlatCount().longValue());
-		
-		
-		
+
 	}
 
-	
-	
-	
 	@Test
 	public void testShouldFindFlatsByAreaCriteria() {
 
@@ -371,7 +340,7 @@ public class BuildingServiceTest {
 		// Building
 		BuildingTO buildingToAdd = createTestBuilding();
 		BuildingTO savedBuilding = buildingService.addBuilding(buildingToAdd);
-		
+
 		// Flat
 		FlatTO flatToAdd = createTestFlat();
 		flatToAdd.setArea(30D);
@@ -379,21 +348,20 @@ public class BuildingServiceTest {
 
 		FlatTO secondFlatToAdd = createTestFlat();
 		secondFlatToAdd.setArea(40D);
-		FlatTO secondSavedFlat = buildingService.addFlat(secondFlatToAdd, savedBuilding);
+		buildingService.addFlat(secondFlatToAdd, savedBuilding);
 
 		FlatTO thirdFlatToAdd = createTestFlat();
 		thirdFlatToAdd.setArea(18D);
-		FlatTO thirdSavedFlat = buildingService.addFlat(thirdFlatToAdd, savedBuilding);
+		buildingService.addFlat(thirdFlatToAdd, savedBuilding);
 		// when
 		List<FlatTO> foundFlats = buildingService.findUnsoldFlatsByCriteria(searchParams);
 
 		// then
 		assertEquals(foundFlatsListBeforeSize + 1, foundFlats.size());
-		assertTrue(foundFlats.stream().anyMatch(b->b.getId().equals(savedFlat.getId())));
+		assertTrue(foundFlats.stream().anyMatch(b -> b.getId().equals(savedFlat.getId())));
 
 	}
-	
-	
+
 	@Test
 	public void testShouldFindFlatsByAreaAndBalconyCriteria() {
 
@@ -407,12 +375,12 @@ public class BuildingServiceTest {
 		// Building
 		BuildingTO buildingToAdd = createTestBuilding();
 		BuildingTO savedBuilding = buildingService.addBuilding(buildingToAdd);
-		
+
 		// Flat
 		FlatTO flatToAdd = createTestFlat();
 		flatToAdd.setArea(30D);
 		flatToAdd.setBalconyCount(0);
-		FlatTO savedFlat = buildingService.addFlat(flatToAdd, savedBuilding);
+		buildingService.addFlat(flatToAdd, savedBuilding);
 
 		FlatTO secondFlatToAdd = createTestFlat();
 		secondFlatToAdd.setArea(40D);
@@ -422,117 +390,31 @@ public class BuildingServiceTest {
 		FlatTO thirdFlatToAdd = createTestFlat();
 		thirdFlatToAdd.setArea(18D);
 		thirdFlatToAdd.setBalconyCount(1);
-		FlatTO thirdSavedFlat = buildingService.addFlat(thirdFlatToAdd, savedBuilding);
+		buildingService.addFlat(thirdFlatToAdd, savedBuilding);
 		// when
 		List<FlatTO> foundFlats = buildingService.findUnsoldFlatsByCriteria(searchParams);
 
 		// then
 		assertEquals(foundFlatsListBeforeSize + 1, foundFlats.size());
+		assertTrue(foundFlats.stream().anyMatch(b -> b.getId().equals(secondSavedFlat.getId())));
 
 	}
 
-	//@Test
-	public void testShouldCountNumberOfFreeFlatsForBuilding(){
-		
-		
-		
-		BuildingTO buildingToAdd = createTestBuilding();
-		BuildingTO savedBuilding = buildingService.addBuilding(buildingToAdd);
-	
-		
-		FlatTO firstFlatToAdd = createTestFlat();
-		FlatTO savedFlat = buildingService.addFlat(firstFlatToAdd, savedBuilding);
-		
-		Long numberOfFreeFlatsBefore = buildingService.countFreeFlatFromBuilding(savedBuilding);
-		
-		FlatTO secondFlatToAdd = createTestFlat();
-		FlatTO secondSavedFlat = buildingService.addFlat(secondFlatToAdd, savedBuilding);
-		
-		//Second building
-		BuildingTO secondBuildingToAdd = createTestBuilding();
-		BuildingTO secondSavedBuilding = buildingService.addBuilding(secondBuildingToAdd);
-		
-		FlatTO secondBuildingFlatToAdd = createTestFlat();
-		FlatTO secondBuildingSavedFlat = buildingService.addFlat(secondBuildingFlatToAdd, secondSavedBuilding);
-		
-		
-		//when
-		Long numberOfFreeFlats = buildingService.countFreeFlatFromBuilding(savedBuilding);
-		
-		//then
-		assertEquals(numberOfFreeFlatsBefore.longValue()+1L, numberOfFreeFlats.longValue());
-		
-		
-		
-	}
-	
-	
-	//@Test
-	public void testShouldFindBuildingsWithMaxmimumNumberFreeFlats(){
-		
-		//given
-		int foundBuildingsListBeforeSize = buildingService.findBuildingsWithMaxmimumNumberFreeFlats().size();
-		//Building 1
-		BuildingTO buildingToAdd = createTestBuilding();
-		BuildingTO savedBuilding = buildingService.addBuilding(buildingToAdd);
-		//Flat 1
-		FlatTO flatToAdd = createTestFlat();
-		FlatTO savedFlat = buildingService.addFlat(flatToAdd, savedBuilding);
-		//Flat 2
-		FlatTO secondFlatToAdd = createTestFlat();
-		FlatTO secondSavedFlat = buildingService.addFlat(secondFlatToAdd, savedBuilding);
-		
-		//Building 2
-		BuildingTO anotherBuildingToAdd = createTestBuilding();
-		BuildingTO anotherSavedBuilding = buildingService.addBuilding(anotherBuildingToAdd);
-		//Flat 1
-		FlatTO anotherFlatToAdd = createTestFlat();
-		FlatTO anotherSavedFlat = buildingService.addFlat(anotherFlatToAdd, anotherSavedBuilding);
-		
-		
-		//when
-		List<BuildingTO> foundBuildings = buildingService.findBuildingsWithMaxmimumNumberFreeFlats();
-		
-		
-		
-		
-		//then
-		assertEquals(foundBuildingsListBeforeSize+1, foundBuildings.size());
-		
-		
-		
-		
-	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	private BuildingTO createTestBuilding() {
 
-		Address address = Address.builder().street("Niepodleglosci")
-				.buildingNumber(String.valueOf((int) (Math.random() * 100 + 1)))
-				.flatNumber(String.valueOf((int) (Math.random() * 100 + 1)))
-				.postalCode(String.valueOf((int) (Math.random() * 100 + 1))).town("Poznan").country("Polska").build();
+		Address address = Address.builder().street("Niepodleglosci").buildingNumber("1").flatNumber("2")
+				.postalCode("60-777").town("Poznan").country("Polska").build();
 
-		BuildingTO createdBuilding = BuildingTO.builder()
-				.description("Nowy budynek nr " + String.valueOf(((int) (Math.random() * 1000)) + 1)).location(address)
-				.storeysNumber((int) (Math.random() * 10) + 1)
-				.hasElevator((int) (Math.random() * 2) == 0 ? false : true).flatCount(0).build();
+		BuildingTO createdBuilding = BuildingTO.builder().description("Nowy budynek").location(address).storeysNumber(1)
+				.hasElevator(false).flatCount(0).build();
 
 		return createdBuilding;
 	}
 
 	private FlatTO createTestFlat() {
 
-		Address address = Address.builder().street("Niepodleglosci")
-				.buildingNumber(String.valueOf((int) (Math.random() * 100 + 1)))
-				.flatNumber(String.valueOf((int) (Math.random() * 100 + 1)))
-				.postalCode(String.valueOf((int) (Math.random() * 100 + 1))).town("Poznan").country("Polska").build();
+		Address address = Address.builder().street("Niepodleglosci").buildingNumber("1").flatNumber("2")
+				.postalCode("60-777").town("Poznan").country("Polska").build();
 
 		FlatTO createdFlat = FlatTO.builder().area(0d).roomsCount(0).balconyCount(0).floorCount(0).location(address)
 				.status(FlatStatus.FREE).price(300000d).build();

@@ -23,17 +23,15 @@ import com.capgemini.types.FlatTO;
 
 @Service
 @Transactional
-public class BuildingServiceImpl implements BuildingService{
-	
-	
+public class BuildingServiceImpl implements BuildingService {
+
 	private BuildingRepository buildingDao;
-	
+
 	private BuildingMapper buildingMapper;
-	
+
 	private FlatRepository flatDao;
-	
+
 	private FlatMapper flatMapper;
-	
 
 	@Autowired
 	public BuildingServiceImpl(BuildingRepository buildingDao, BuildingMapper buildingMapper, FlatRepository flatDao,
@@ -46,69 +44,60 @@ public class BuildingServiceImpl implements BuildingService{
 
 	@Override
 	public BuildingTO addBuilding(BuildingTO newBuilding) {
-		
-		BuildingEntity buildingEntity= buildingDao.save(buildingMapper.mapToEntity(newBuilding));
-		
+
+		BuildingEntity buildingEntity = buildingDao.save(buildingMapper.mapToEntity(newBuilding));
+
 		return buildingMapper.mapToTO(buildingEntity);
 	}
 
 	@Override
 	public BuildingTO findBuildingById(BuildingTO building) {
-		
+
 		BuildingEntity buildingEntity = buildingDao.findOne(building.getId());
-		
-	
-	
+
 		return buildingMapper.mapToTO(buildingEntity);
 	}
-	
-	
+
 	@Override
 	public BuildingTO updateBuilding(BuildingTO building) {
 
 		BuildingEntity buildingToUpdate = buildingDao.findOne(building.getId());
-		
-		if(building.getVersion()!=buildingToUpdate.getVersion()){
+
+		if (building.getVersion().longValue() != buildingToUpdate.getVersion().longValue()) {
 			throw new CannotPerformActionException("Optimistic locking exception!");
 		}
-		
+
 		return buildingMapper.update(building, buildingToUpdate);
 	}
-	
-	
+
 	@Override
 	public BuildingTO removeBuilding(BuildingTO building) {
-		
+
 		buildingDao.delete(building.getId());
-		
+
 		return building;
 	}
-	
 
 	@Override
 	public List<BuildingTO> findAllBuildings() {
-		
+
 		List<BuildingEntity> buildingEntityList = buildingDao.findAll();
-		
-		
+
 		return buildingMapper.mapToTOList(buildingEntityList);
 	}
 
 	@Override
 	public FlatTO addFlat(FlatTO newFlat, BuildingTO building) {
-		
-		
-		
-		
+
 		BuildingEntity foundBuilding = buildingDao.findOne(building.getId());
-		if(foundBuilding==null){
+		if (foundBuilding == null) {
 			throw new CannotPerformActionException("There is no building with that id!");
 		}
-		FlatEntity flatEntity= flatMapper.mapToEntity(newFlat);
+		FlatEntity flatEntity = flatMapper.mapToEntity(newFlat);
 		foundBuilding.addFlat(flatEntity);
 		FlatEntity savedFlat = flatDao.save(flatEntity);
-		foundBuilding.setFlatCount(foundBuilding.getFlatCount()+1);
-		
+		foundBuilding.setFlatCount(foundBuilding.getFlatCount() + 1);
+
 		return flatMapper.mapToTO(savedFlat);
 	}
 
@@ -121,39 +110,35 @@ public class BuildingServiceImpl implements BuildingService{
 
 	@Override
 	public FlatTO updateFlat(FlatTO flat) {
-		
+
 		FlatEntity flatToUpdate = flatDao.findOne(flat.getId());
-		
-		if(flat.getVersion()!=flatToUpdate.getVersion()){
+
+		if (!flat.getVersion().equals(flatToUpdate.getVersion())) {
 			throw new CannotPerformActionException("Optimistic locking exception!");
 		}
 
 		return flatMapper.update(flat, flatToUpdate);
 	}
 
-
-
-
-
 	@Override
 	public FlatTO removeFlat(FlatTO flat) {
 
 		flatDao.delete(flat.getId());
 		Integer beforeDeleteFlatCount = buildingDao.findOne(flat.getBuildingId()).getFlatCount();
-		buildingDao.findOne(flat.getBuildingId()).setFlatCount(beforeDeleteFlatCount-1);
-		
+		buildingDao.findOne(flat.getBuildingId()).setFlatCount(beforeDeleteFlatCount - 1);
+
 		return flat;
 	}
-	//TODO
+
 	@Override
 	public Double countPricesSumOfFlatsBoughtByClient(ClientTO client) {
-		
+
 		return buildingDao.countPricesSumOfFlatsBoughtByClient(client.getId());
 	}
 
 	@Override
 	public Double countAveragePriceOfFlatInTheBuilding(BuildingTO building) {
-		
+
 		return buildingDao.countAveragePriceOfFlatInTheBuilding(building.getId());
 	}
 
@@ -161,41 +146,21 @@ public class BuildingServiceImpl implements BuildingService{
 	public List<FlatTO> findUnsoldFlatsByCriteria(FlatSearchParamsTO flatSearchParamsTO) {
 		List<FlatEntity> foundFlats = flatDao.findUnsoldFlatsByCriteria(flatSearchParamsTO);
 
-		
 		return flatMapper.mapToTOList(foundFlats);
 	}
 
 	@Override
 	public Long countNumberOfFlatsByStatus(FlatStatus flatStatus, Long buildingId) {
-		
+
 		return buildingDao.countNumberOfFlatsByStatus(flatStatus, buildingId);
 	}
 
-	//TODO
 	@Override
 	public List<BuildingTO> findBuildingsWithMaxmimumNumberFreeFlats() {
 
 		List<BuildingEntity> foundBuildings = buildingDao.findBuildingsWithMaxmimumNumberFreeFlats();
-		
-		
+
 		return buildingMapper.mapToTOList(foundBuildings);
 	}
-
-	@Override
-	public Long countFreeFlatFromBuilding(BuildingTO building) {
-
-
-		
-		
-		
-		return buildingDao.countFreeFlatFromBuilding(building.getId());
-	}
-	
-	
-	
-	
-	
-	
-	
 
 }

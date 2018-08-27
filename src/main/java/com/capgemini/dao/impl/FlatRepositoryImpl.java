@@ -31,7 +31,7 @@ public class FlatRepositoryImpl implements FlatRepositoryCustom {
 		JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
 		
 		BooleanBuilder builder = new BooleanBuilder();
-		builder.and(flat.status.eq(FlatStatus.FREE));
+		builder.and(flat.status.eq(FlatStatus.FREE).or(flat.status.eq(FlatStatus.BOOKED)));
 		
 		if(flatSearchParamsTO.getAreaMin()!=null){
 			builder.and(flat.area.goe(flatSearchParamsTO.getAreaMin()));
@@ -49,16 +49,12 @@ public class FlatRepositoryImpl implements FlatRepositoryCustom {
 			builder.and(flat.balconyCount.goe(flatSearchParamsTO.getBalconyCountMin()));
 		}
 		if(flatSearchParamsTO.getBalconyCountMax()!=null){
-			builder.and(flat.balconyCount.loe(flatSearchParamsTO.getBalconyCountMax())   );
+			builder.and(flat.balconyCount.loe(flatSearchParamsTO.getBalconyCountMax()));
 		}
 
 		List<FlatEntity> result = queryFactory.selectFrom(flat).where(builder).fetch();
 		
-		
 		return result;
-		
-
-
 	}
 	
 	
@@ -67,7 +63,6 @@ public class FlatRepositoryImpl implements FlatRepositoryCustom {
 
 		
 		QFlatEntity flat = QFlatEntity.flatEntity;
-		
 		JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
 		
 		List<FlatEntity> result = queryFactory
@@ -75,9 +70,7 @@ public class FlatRepositoryImpl implements FlatRepositoryCustom {
 									.where((flat.building.hasElevator.isTrue()).or(flat.floorCount.eq(0)))
 									.fetch();
 		
-		
 		return result;
-		
 		
 	}
 

@@ -22,8 +22,7 @@ public class BuildingMapper {
 		BuildingEntity newEntity = BuildingEntity.builder().description(newBuilding.getDescription())
 				.location(createCopy(newBuilding.getLocation())).storeysNumber(newBuilding.getStoreysNumber())
 				.hasElevator(newBuilding.getHasElevator()).flatCount(newBuilding.getFlatCount())
-				.flats(new ArrayList<FlatEntity>())
-				.build();
+				.flats(new ArrayList<FlatEntity>()).build();
 
 		newEntity.setVersion(newBuilding.getVersion());
 
@@ -42,8 +41,8 @@ public class BuildingMapper {
 	}
 
 	public BuildingTO mapToTO(BuildingEntity building) {
-		
-		if(building==null){
+
+		if (building == null) {
 			return null;
 		}
 
@@ -73,30 +72,26 @@ public class BuildingMapper {
 	}
 
 	public List<BuildingTO> mapToTOList(List<BuildingEntity> buildingEntityList) {
-		
-		if(buildingEntityList==null || buildingEntityList.isEmpty()){
+
+		if (buildingEntityList == null || buildingEntityList.isEmpty()) {
 			return null;
 		}
-		
-		
+
 		List<BuildingTO> mappedList = new ArrayList<>();
 
-		
 		for (BuildingEntity b : buildingEntityList) {
 			mappedList.add(mapToTO(b));
 		}
 
 		return mappedList;
 	}
-	
-	
 
 	public BuildingTO update(BuildingTO buildingTO, BuildingEntity buildingToUpdate) {
 
-		if(buildingTO==null || buildingToUpdate==null){
+		if (buildingTO == null || buildingToUpdate == null) {
 			return null;
 		}
-		
+
 		if (buildingTO.getDescription() != null) {
 			buildingToUpdate.setDescription(buildingTO.getDescription());
 		}
@@ -119,8 +114,5 @@ public class BuildingMapper {
 
 		return mapToTO(buildingToUpdate);
 	}
-	
-	
-	
 
 }

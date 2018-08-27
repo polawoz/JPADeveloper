@@ -8,7 +8,6 @@ import javax.persistence.TypedQuery;
 
 import com.capgemini.dao.BuildingRepositoryCustom;
 import com.capgemini.domain.BuildingEntity;
-import com.capgemini.domain.ClientEntity;
 import com.capgemini.domain.QBuildingEntity;
 import com.capgemini.domain.QFlatEntity;
 import com.capgemini.domain.enums.FlatStatus;
@@ -24,29 +23,14 @@ public class BuildingRepositoryImpl implements BuildingRepositoryCustom {
 	@Override
 	public Double countPricesSumOfFlatsBoughtByClient(Long clientId) {
 	
-		
-	
 		QFlatEntity flat = QFlatEntity.flatEntity;
-		
 		JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
-
 		Double result = queryFactory
 			.select(flat.price.sum()).from(flat)
 			.where(
 				flat.status.eq(FlatStatus.SOLD).and(
 													flat.owner.id.eq(clientId).or(flat.coOwners.any().id.eq(clientId))))
 				.fetchOne();
-		
-		
-
- 
-						
-//		TypedQuery<Double> query = entityManager.createQuery("SELECT SUM(flat.price) FROM FlatEntity flat "
-//				 + "LEFT JOIN flat.coOwners coOwner "
-//				+ "WHERE (flat.status='SOLD' AND (flat.owner.id =:clientId OR coOwner.id=:clientId))", Double.class);
-//		query.setParameter("clientId", clientId);
-		
-		//return query.getSingleResult();
 		
 		return result;
 		
@@ -59,6 +43,7 @@ public class BuildingRepositoryImpl implements BuildingRepositoryCustom {
 		TypedQuery<Double> query = entityManager.createQuery(
 				"SELECT AVG(flat.price) FROM FlatEntity flat " + "WHERE (flat.building.id =:buildingId)", Double.class);
 		query.setParameter("buildingId", buildingId);
+		
 		return query.getSingleResult();
 	}
 
@@ -72,22 +57,18 @@ public class BuildingRepositoryImpl implements BuildingRepositoryCustom {
 						Long.class);
 		query.setParameter("flatStatus", flatStatus.toString());
 		query.setParameter("buildingId", buildingId);
+		
 		return query.getSingleResult();
 
 	}
 
 	@Override
 	public List<BuildingEntity> findBuildingsWithMaxmimumNumberFreeFlats() {
-		// TODO
-		
 		
 		QBuildingEntity building = QBuildingEntity.buildingEntity;
-		
 		QFlatEntity flat = QFlatEntity.flatEntity;
-		
 		JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
-		
-		
+	
 		Long max = queryFactory
 				.select(flat.count())
 				.from(building)
@@ -102,46 +83,15 @@ public class BuildingRepositoryImpl implements BuildingRepositoryCustom {
 			return null;
 		}
 		
-		
 		List<BuildingEntity> resultMax = queryFactory.selectFrom(building)
 				.where(
-								JPAExpressions.select(flat.count()).from(building.flats, flat)
-								.where(flat.status.eq(FlatStatus.FREE))
-							.eq(max))
+							JPAExpressions.select(flat.count()).from(building.flats, flat)
+							.where(flat.status.eq(FlatStatus.FREE))
+						.eq(max))
 				.fetch();
-		
-		
-		
+	
 		return resultMax;
-		
-		
-		
 
 	}
-
-	@Override
-	public Long countFreeFlatFromBuilding(Long buildingId) {
-		
-	
-		QBuildingEntity building = QBuildingEntity.buildingEntity;
-		
-		QFlatEntity flat = QFlatEntity.flatEntity;
-		
-		JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
-
-		Long result = queryFactory
-				
-			.select(flat.count())
-			.from(building)
-			.join(building.flats, flat)
-			.where(
-					flat.status.eq(FlatStatus.FREE).and(building.id.eq(buildingId))).fetchOne();
-		
-		return result;
-		
-	}
-	
-	
-	
 
 }

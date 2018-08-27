@@ -15,10 +15,7 @@ public interface BuildingRepositoryCustom {
 	
 	List<BuildingEntity> findBuildingsWithMaxmimumNumberFreeFlats();
 	
-	Long countFreeFlatFromBuilding(Long buildingId);
-	
-	
-	
+
 	
 
 	

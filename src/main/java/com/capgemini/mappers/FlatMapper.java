@@ -6,10 +6,8 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import com.capgemini.domain.Address;
-import com.capgemini.domain.BuildingEntity;
 import com.capgemini.domain.ClientEntity;
 import com.capgemini.domain.FlatEntity;
-import com.capgemini.types.BuildingTO;
 import com.capgemini.types.ClientTO;
 import com.capgemini.types.FlatTO;
 
@@ -25,7 +23,7 @@ public class FlatMapper {
 		FlatEntity newEntity = FlatEntity.builder().area(newFlat.getArea()).roomsCount(newFlat.getRoomsCount())
 				.balconyCount(newFlat.getBalconyCount()).floorCount(newFlat.getFloorCount())
 				.location(createCopy(newFlat.getLocation())).status(newFlat.getStatus()).price(newFlat.getPrice())
-				.build();
+				.coOwners(new ArrayList<ClientEntity>()).build();
 
 		newEntity.setVersion(newFlat.getVersion());
 
@@ -45,10 +43,10 @@ public class FlatMapper {
 
 	public FlatTO mapToTO(FlatEntity flat) {
 
-		if(flat==null){
+		if (flat == null) {
 			return null;
 		}
-		
+
 		return FlatTO.builder().id(flat.getId()).area(flat.getArea()).roomsCount(flat.getRoomsCount())
 				.balconyCount(flat.getBalconyCount()).floorCount(flat.getFloorCount())
 				.location(createCopy(flat.getLocation())).status(flat.getStatus()).price(flat.getPrice())
@@ -74,10 +72,10 @@ public class FlatMapper {
 	}
 
 	public List<FlatTO> mapToTOList(List<FlatEntity> flatEntityList) {
-		if(flatEntityList==null){
+		if (flatEntityList == null) {
 			return null;
 		}
-		
+
 		List<FlatTO> mappedList = new ArrayList<>();
 
 		for (FlatEntity f : flatEntityList) {
@@ -133,7 +131,5 @@ public class FlatMapper {
 
 		return mapToTO(flatToUpdate);
 	}
-
-
 
 }

@@ -1,9 +1,6 @@
 package com.capgemini.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.sql.Date;
 import java.util.ArrayList;
@@ -39,18 +36,14 @@ public class ClientsServiceTest {
 
 		// given
 		ClientTO createdTestClient = createTestClient();
+		createdTestClient.setEMail("email_klienta@testowego.pl");
 
 		// when
 		ClientTO savedClient = clientsService.addClient(createdTestClient);
 
 		// then
 		assertNotNull(savedClient);
-		assertEquals(createdTestClient.getLastName(), savedClient.getLastName());
-		assertEquals(createdTestClient.getFirstName(), savedClient.getFirstName());
-		assertEquals(createdTestClient.getDateOfBirth(), savedClient.getDateOfBirth());
 		assertEquals(createdTestClient.getEMail(), savedClient.getEMail());
-		assertEquals(createdTestClient.getPhoneNumber(), savedClient.getPhoneNumber());
-		assertEquals(createdTestClient.getAddress().getBuildingNumber(), savedClient.getAddress().getBuildingNumber());
 
 	}
 
@@ -59,6 +52,8 @@ public class ClientsServiceTest {
 
 		// given
 		ClientTO createdTestClient = createTestClient();
+		createdTestClient.setEMail("email_klienta@testowego.pl");
+
 		ClientTO savedClient = clientsService.addClient(createdTestClient);
 
 		// when
@@ -67,12 +62,7 @@ public class ClientsServiceTest {
 		// then
 		assertNotNull(foundClient);
 		assertEquals(savedClient.getId(), foundClient.getId());
-		assertEquals(createdTestClient.getLastName(), foundClient.getLastName());
-		assertEquals(createdTestClient.getFirstName(), foundClient.getFirstName());
-		assertEquals(createdTestClient.getDateOfBirth(), foundClient.getDateOfBirth());
-		assertEquals(createdTestClient.getEMail(), foundClient.getEMail());
-		assertEquals(createdTestClient.getPhoneNumber(), foundClient.getPhoneNumber());
-		assertEquals(createdTestClient.getAddress().getBuildingNumber(), foundClient.getAddress().getBuildingNumber());
+		assertEquals(createdTestClient.getEMail(), savedClient.getEMail());
 
 	}
 
@@ -97,7 +87,7 @@ public class ClientsServiceTest {
 		// CoOwner client
 		ClientTO clientToAddCoOwner = createTestClient();
 		ClientTO savedClientCoOwner = clientsService.addClient(clientToAddCoOwner);
-		
+
 		ClientTO secondClientToAddCoOwner = createTestClient();
 		ClientTO secondSavedClientCoOwner = clientsService.addClient(secondClientToAddCoOwner);
 
@@ -115,11 +105,10 @@ public class ClientsServiceTest {
 		assertTrue(flatTO.getCoOwnersId().stream().anyMatch(b -> b == savedClientCoOwner.getId()));
 		assertTrue(flatTO.getCoOwnersId().stream().anyMatch(b -> b == secondSavedClientCoOwner.getId()));
 
-		
 		ClientTO updatedClientOwner = clientsService.findClientById(savedClient);
 		ClientTO updatedClientCoOwner = clientsService.findClientById(savedClientCoOwner);
 		ClientTO secondUpdatedClientCoOwner = clientsService.findClientById(secondSavedClientCoOwner);
-		
+
 		assertTrue(updatedClientOwner.getFlatsOwnedIds().stream().anyMatch(b -> b == flatTO.getId()));
 		assertTrue(updatedClientCoOwner.getFlatsCoOwnedIds().stream().anyMatch(b -> b == flatTO.getId()));
 		assertTrue(secondUpdatedClientCoOwner.getFlatsCoOwnedIds().stream().anyMatch(b -> b == flatTO.getId()));
@@ -230,11 +219,11 @@ public class ClientsServiceTest {
 		ClientTO clientToAdd = createTestClient();
 		ClientTO savedClient = clientsService.addClient(clientToAdd);
 
-		FlatTO flatTO = clientsService.makeReservation(savedFlat, savedClient, new ArrayList<>());
+		clientsService.makeReservation(savedFlat, savedClient, new ArrayList<>());
 
-		FlatTO secondFlatTO = clientsService.makeReservation(secondSavedFlat, savedClient, new ArrayList<>());
+		clientsService.makeReservation(secondSavedFlat, savedClient, new ArrayList<>());
 
-		FlatTO thirdFlatTO = clientsService.makeReservation(thirdSavedFlat, savedClient, new ArrayList<>());
+		clientsService.makeReservation(thirdSavedFlat, savedClient, new ArrayList<>());
 
 		boolean exceptionThrown = false;
 		// when
@@ -287,11 +276,11 @@ public class ClientsServiceTest {
 		List<ClientTO> coOwnersList = new ArrayList<>();
 		coOwnersList.add(savedClientCoOwner);
 
-		FlatTO flatTO = clientsService.makeReservation(savedFlat, savedClient, coOwnersList);
+		clientsService.makeReservation(savedFlat, savedClient, coOwnersList);
 
-		FlatTO secondFlatTO = clientsService.makeReservation(secondSavedFlat, savedClient, coOwnersList);
+		clientsService.makeReservation(secondSavedFlat, savedClient, coOwnersList);
 
-		FlatTO thirdFlatTO = clientsService.makeReservation(thirdSavedFlat, savedClient, coOwnersList);
+		clientsService.makeReservation(thirdSavedFlat, savedClient, coOwnersList);
 
 		// when
 
@@ -308,6 +297,8 @@ public class ClientsServiceTest {
 
 		// given
 		ClientTO clientToAdd = createTestClient();
+		clientToAdd.setFirstName("Patryk");
+		;
 		ClientTO savedClient = clientsService.addClient(clientToAdd);
 
 		ClientTO updateParameters = ClientTO.builder().id(savedClient.getId()).firstName("Patrycja").build();
@@ -365,22 +356,22 @@ public class ClientsServiceTest {
 
 		FlatTO flatTO = clientsService.makeReservation(savedFlat, savedClient, coOwnersList);
 
-		//when
+		// when
 		FlatTO flatAfterCancellingReservation = clientsService.cancelReservation(flatTO);
-		
-		
-		
+
 		// then
 		ClientTO clientAfterCancellingReservation = clientsService.findClientById(savedClient);
 		ClientTO coOwnerAfterCancellingReservation = clientsService.findClientById(savedClientCoOwner);
-		
-		assertTrue(clientAfterCancellingReservation.getFlatsOwnedIds().stream().noneMatch(b->b.equals(savedFlat.getId())));
+
+		assertTrue(clientAfterCancellingReservation.getFlatsOwnedIds().stream()
+				.noneMatch(b -> b.equals(savedFlat.getId())));
 		assertEquals(FlatStatus.FREE, flatAfterCancellingReservation.getStatus());
 		assertNull(flatAfterCancellingReservation.getOwnerId());
-		assertTrue(flatAfterCancellingReservation.getCoOwnersId().stream().noneMatch(b-> b.equals(savedClientCoOwner.getId())));
-		assertTrue(coOwnerAfterCancellingReservation.getFlatsCoOwnedIds().stream().noneMatch(b->b.equals(savedFlat.getId())));
+		assertTrue(flatAfterCancellingReservation.getCoOwnersId().stream()
+				.noneMatch(b -> b.equals(savedClientCoOwner.getId())));
+		assertTrue(coOwnerAfterCancellingReservation.getFlatsCoOwnedIds().stream()
+				.noneMatch(b -> b.equals(savedFlat.getId())));
 		assertTrue(flatTO.getCoOwnersId().stream().anyMatch(b -> b == savedClientCoOwner.getId()));
-
 
 	}
 
@@ -388,9 +379,6 @@ public class ClientsServiceTest {
 	public void testShouldCountTheSumOfFlatsBoughtByClient() {
 
 		// given
-		
-		
-		
 		BuildingTO buildingToAdd = createTestBuilding();
 		BuildingTO savedBuilding = buildingService.addBuilding(buildingToAdd);
 
@@ -404,18 +392,14 @@ public class ClientsServiceTest {
 		secondFlatToAdd.setPrice(30000D);
 		FlatTO secondSavedFlat = buildingService.addFlat(secondFlatToAdd, savedBuilding);
 
-	
-		//Clients
+		// Clients
 		ClientTO clientToAdd = createTestClient();
 		ClientTO savedClient = clientsService.addClient(clientToAdd);
-		
-		
-		
-		//Transaction
-		FlatTO boughtFirstFlat = clientsService.buyFlat(savedFlat, savedClient, new ArrayList<>());
-		FlatTO boughtSecondFlat = clientsService.buyFlat(secondSavedFlat, savedClient, new ArrayList<>());
-		
-	
+
+		// Transaction
+		clientsService.buyFlat(savedFlat, savedClient, new ArrayList<>());
+		clientsService.buyFlat(secondSavedFlat, savedClient, new ArrayList<>());
+
 		// when
 		Double pricesSum = buildingService.countPricesSumOfFlatsBoughtByClient(savedClient);
 
@@ -423,17 +407,11 @@ public class ClientsServiceTest {
 		assertEquals(new Double(65000), pricesSum);
 
 	}
-	
-	
-	
-	
+
 	@Test
 	public void testShouldCountTheSumOfFlatsBoughtByClientCoOwnershipIncluded() {
 
-	// given
-		
-		
-		
+		// given
 		BuildingTO buildingToAdd = createTestBuilding();
 		BuildingTO savedBuilding = buildingService.addBuilding(buildingToAdd);
 
@@ -455,22 +433,22 @@ public class ClientsServiceTest {
 		FlatTO flatToAddSecondBuilding = createTestFlat();
 		flatToAddSecondBuilding.setPrice(25000D);
 		FlatTO thirdSavedFlat = buildingService.addFlat(flatToAddSecondBuilding, secondSavedBuilding);
-		
-		//Clients
+
+		// Clients
 		ClientTO clientToAdd = createTestClient();
 		ClientTO savedClient = clientsService.addClient(clientToAdd);
-		
+
 		ClientTO secondClientToAdd = createTestClient();
 		ClientTO secondSavedClient = clientsService.addClient(secondClientToAdd);
-		
+
 		List<ClientTO> coOwnersList = new ArrayList<>();
 		coOwnersList.add(savedClient);
-		
-		//Transaction
-		FlatTO boughtFirstFlat = clientsService.buyFlat(savedFlat, savedClient, new ArrayList<>());
-		FlatTO boughtSecondFlat = clientsService.buyFlat(secondSavedFlat, savedClient, new ArrayList<>());
-		FlatTO boughtThirdFlatAsCoOwner = clientsService.buyFlat(thirdSavedFlat, secondSavedClient, coOwnersList);
-	
+
+		// Transaction
+		clientsService.buyFlat(savedFlat, savedClient, new ArrayList<>());
+		clientsService.buyFlat(secondSavedFlat, savedClient, new ArrayList<>());
+		clientsService.buyFlat(thirdSavedFlat, secondSavedClient, coOwnersList);
+
 		// when
 		Double pricesSum = buildingService.countPricesSumOfFlatsBoughtByClient(savedClient);
 
@@ -478,8 +456,6 @@ public class ClientsServiceTest {
 		assertEquals(new Double(90000), pricesSum);
 
 	}
-
-	
 
 	@Test
 	public void testShouldCountAveragePriceOfFlatInTheBuilding() {
@@ -536,24 +512,24 @@ public class ClientsServiceTest {
 		FlatTO secondSavedFlat = buildingService.addFlat(secondFlatToAdd, savedBuilding);
 
 		// Owner client
-		//Clients
+		// Clients
 		ClientTO clientToAdd = createTestClient();
 		ClientTO savedClient = clientsService.addClient(clientToAdd);
-		
+
 		ClientTO secondClientToAdd = createTestClient();
 		ClientTO secondSavedClient = clientsService.addClient(secondClientToAdd);
 		FlatTO scFlatToAdd = createTestFlat();
 		FlatTO scSavedFlat = buildingService.addFlat(scFlatToAdd, savedBuilding);
 		FlatTO scSecondFlatToAdd = createTestFlat();
 		FlatTO scSecondSavedFlat = buildingService.addFlat(scSecondFlatToAdd, savedBuilding);
-		FlatTO scBoughtFlat = clientsService.buyFlat(scSavedFlat, secondSavedClient, new ArrayList<>());
-		FlatTO scSecondBoughtFlat = clientsService.buyFlat(scSecondSavedFlat, secondSavedClient, new ArrayList<>());
-		
-		//Transaction
+		clientsService.buyFlat(scSavedFlat, secondSavedClient, new ArrayList<>());
+		clientsService.buyFlat(scSecondSavedFlat, secondSavedClient, new ArrayList<>());
+
+		// Transaction
 		List<ClientTO> coOwnersList = new ArrayList<>();
 
-		FlatTO boughtFlat = clientsService.buyFlat(savedFlat, savedClient, coOwnersList);
-		FlatTO secondBoughtFlat = clientsService.buyFlat(secondSavedFlat, savedClient, coOwnersList);
+		clientsService.buyFlat(savedFlat, savedClient, coOwnersList);
+		clientsService.buyFlat(secondSavedFlat, savedClient, coOwnersList);
 
 		// when
 		List<ClientTO> foundClients = clientsService.findClientsWhoBoughtFlatsMoreThan(1L);
@@ -562,10 +538,7 @@ public class ClientsServiceTest {
 		assertEquals(foundClientListBeforeSize + 2, foundClients.size());
 
 	}
-	
-	
-	
-	
+
 	@Test
 	public void testShouldFindClientsWhoBoughtFlatsMoreThanCoOwnershipIncluded() {
 
@@ -586,20 +559,20 @@ public class ClientsServiceTest {
 		FlatTO secondSavedFlat = buildingService.addFlat(secondFlatToAdd, savedBuilding);
 
 		// Owner client
-		//Clients
+		// Clients
 		ClientTO clientToAdd = createTestClient();
 		ClientTO savedClient = clientsService.addClient(clientToAdd);
-		
-		//Other client
+
+		// Other client
 		ClientTO secondClientToAdd = createTestClient();
 		ClientTO secondSavedClient = clientsService.addClient(secondClientToAdd);
-		
-		//Transaction
+
+		// Transaction
 		List<ClientTO> coOwnersList = new ArrayList<>();
 		coOwnersList.add(savedClient);
 
-		FlatTO boughtFlat = clientsService.buyFlat(savedFlat, savedClient, new ArrayList<>());
-		FlatTO secondBoughtFlat = clientsService.buyFlat(secondSavedFlat, secondSavedClient, coOwnersList);
+		clientsService.buyFlat(savedFlat, savedClient, new ArrayList<>());
+		clientsService.buyFlat(secondSavedFlat, secondSavedClient, coOwnersList);
 
 		// when
 		List<ClientTO> foundClients = clientsService.findClientsWhoBoughtFlatsMoreThan(1L);
@@ -609,7 +582,6 @@ public class ClientsServiceTest {
 
 	}
 
-	
 	@Test
 	public void testShoudlFindFlatsDisabledSuitable() {
 
@@ -651,11 +623,7 @@ public class ClientsServiceTest {
 		assertTrue(foundFlats.stream().anyMatch(b -> b.getId().equals(anotherSavedFlat.getId())));
 
 	}
-	
-	
-	
-	
-	
+
 	@Test
 	public void testShouldCountNumberOfFlatsByStatus() {
 
@@ -663,173 +631,100 @@ public class ClientsServiceTest {
 		// Building
 		BuildingTO buildingToAdd = createTestBuilding();
 		BuildingTO savedBuilding = buildingService.addBuilding(buildingToAdd);
-		
+
 		Long flatCountBefore = buildingService.countNumberOfFlatsByStatus(FlatStatus.FREE, savedBuilding.getId());
 
 		// Flat
 		FlatTO flatToAdd = createTestFlat();
-		FlatTO savedFlat = buildingService.addFlat(flatToAdd, savedBuilding);
-		
+		buildingService.addFlat(flatToAdd, savedBuilding);
+
 		FlatTO secondFlatToAdd = createTestFlat();
-		FlatTO secondSavedFlat = buildingService.addFlat(secondFlatToAdd, savedBuilding);
-		
-		//Sold flat
+		buildingService.addFlat(secondFlatToAdd, savedBuilding);
+
+		// Sold flat
 		FlatTO thirdFlatToAdd = createTestFlat();
 		FlatTO thirdSavedFlat = buildingService.addFlat(thirdFlatToAdd, savedBuilding);
 		ClientTO clientToAdd = createTestClient();
 		ClientTO savedClient = clientsService.addClient(clientToAdd);
-		FlatTO boughtFlat = clientsService.buyFlat(thirdSavedFlat, savedClient, new ArrayList<>());
-		
-		//when
+		clientsService.buyFlat(thirdSavedFlat, savedClient, new ArrayList<>());
+
+		// when
 		Long flatCountAfter = buildingService.countNumberOfFlatsByStatus(FlatStatus.FREE, savedBuilding.getId());
-		
-		//then
-		assertEquals(flatCountBefore.longValue()+2L, flatCountAfter.longValue());
+
+		// then
+		assertEquals(flatCountBefore.longValue() + 2L, flatCountAfter.longValue());
 
 	}
-	
-	
-	
 
+	@DirtiesContext(methodMode = MethodMode.BEFORE_METHOD)
 	@Test
-	public void testShouldCountNumberOfFreeFlatsForBuilding(){
-		
-		
-		
-		BuildingTO buildingToAdd = createTestBuilding();
-		BuildingTO savedBuilding = buildingService.addBuilding(buildingToAdd);
-	
-		
-		FlatTO firstFlatToAdd = createTestFlat();
-		FlatTO savedFlat = buildingService.addFlat(firstFlatToAdd, savedBuilding);
-		
-		Long numberOfFreeFlatsBefore = buildingService.countFreeFlatFromBuilding(savedBuilding);
-		
-		FlatTO secondFlatToAdd = createTestFlat();
-		FlatTO secondSavedFlat = buildingService.addFlat(secondFlatToAdd, savedBuilding);
-		
-		//Second building
-		BuildingTO secondBuildingToAdd = createTestBuilding();
-		BuildingTO secondSavedBuilding = buildingService.addBuilding(secondBuildingToAdd);
-		
-		FlatTO secondBuildingFlatToAdd = createTestFlat();
-		FlatTO secondBuildingSavedFlat = buildingService.addFlat(secondBuildingFlatToAdd, secondSavedBuilding);
-		
-		//Sold
-		FlatTO thirdFlatToAdd = createTestFlat();
-		FlatTO thirdSavedFlat = buildingService.addFlat(thirdFlatToAdd, savedBuilding);
-		ClientTO clientToAdd = createTestClient();
-		ClientTO savedClient = clientsService.addClient(clientToAdd);
-		FlatTO boughtFlat = clientsService.buyFlat(thirdSavedFlat, savedClient, new ArrayList<>());
-		
-		
-		//when
-		Long numberOfFreeFlats = buildingService.countFreeFlatFromBuilding(savedBuilding);
-		
-		//then
-		assertEquals(numberOfFreeFlatsBefore.longValue()+1L, numberOfFreeFlats.longValue());
-		
-		
-		
-	}
-	
-	@DirtiesContext(methodMode=MethodMode.BEFORE_METHOD)
-	@Test
-	public void testShouldFindBuildingsWithMaxmimumNumberFreeFlats(){
-		
-		//given
+	public void testShouldFindBuildingsWithMaxmimumNumberFreeFlats() {
 
-	
-		//Building 1
+		// given
+		// Building 1
 		BuildingTO buildingToAdd = createTestBuilding();
 		buildingToAdd.setDescription("Maksymalna liczba mieszkan wolnych");
 		BuildingTO savedBuilding = buildingService.addBuilding(buildingToAdd);
-		
-		//Flat 1
+
+		// Flat 1
 		FlatTO flatToAdd = createTestFlat();
-		FlatTO savedFlat = buildingService.addFlat(flatToAdd, savedBuilding);
-		//Flat 2
+		buildingService.addFlat(flatToAdd, savedBuilding);
+		// Flat 2
 		FlatTO secondFlatToAdd = createTestFlat();
-		FlatTO secondSavedFlat = buildingService.addFlat(secondFlatToAdd, savedBuilding);
-		
-		//Building 2
+		buildingService.addFlat(secondFlatToAdd, savedBuilding);
+
+		// Building 2
 		BuildingTO anotherBuildingToAdd = createTestBuilding();
 		BuildingTO anotherSavedBuilding = buildingService.addBuilding(anotherBuildingToAdd);
-		//Flat 1
+		// Flat 1
 		FlatTO anotherFlatToAdd = createTestFlat();
-		FlatTO anotherSavedFlat = buildingService.addFlat(anotherFlatToAdd, anotherSavedBuilding);
-		
-		
-		//when
+		buildingService.addFlat(anotherFlatToAdd, anotherSavedBuilding);
+
+		// when
 		List<BuildingTO> foundBuildings = buildingService.findBuildingsWithMaxmimumNumberFreeFlats();
-		
-		
-		//then
+
+		// then
 		assertEquals(1, foundBuildings.size());
-		assertTrue(foundBuildings.stream().anyMatch(b->b.getDescription().equals(savedBuilding.getDescription())));
-		
-		
+		assertTrue(foundBuildings.stream().anyMatch(b -> b.getDescription().equals(savedBuilding.getDescription())));
+
 	}
-	
 
 	private ClientTO createTestClient() {
 
-		String[] lastNameTable = { "Kowalski", "Nowak", "Piotrowski", "Adamski", "Lecki", "Markowski", "Przybylski",
-				"Wisniewski", "Majetny", "Stratny" };
-
-		String[] firstNameTable = { "Jacek", "Placek", "Mateusz", "Arek", "Artur", "Pawel", "Patryk", "Blazej", "Jan",
-				"Jakub" };
-
-		String lastName = lastNameTable[(int) (Math.random() * 10)];
-		String firstName = firstNameTable[(int) (Math.random() * 10)];
+		String lastName = "Kowalski";
+		String firstName = "Jan";
 		String eMail = firstName.toLowerCase().charAt(0) + "." + lastName.toLowerCase() + "@gmail.com";
 		Date dateOfBirth = Date.valueOf("1999-12-12");
 
-		Address address = Address.builder().street("Niepodleglosci")
-				.buildingNumber(String.valueOf((int) (Math.random() * 100 + 1)))
-				.flatNumber(String.valueOf((int) (Math.random() * 100 + 1)))
-				.postalCode(String.valueOf((int) (Math.random() * 100 + 1))).town("Poznan").country("Polska").build();
+		Address address = Address.builder().street("Niepodleglosci").buildingNumber("1").flatNumber("2")
+				.postalCode("60-777").town("Poznan").country("Polska").build();
 
 		ClientTO createdClient = ClientTO.builder().lastName(lastName).firstName(firstName).address(address)
-				.phoneNumber(String.valueOf((int) (Math.random() * 10000000))).eMail(eMail).dateOfBirth(dateOfBirth)
-				.build();
+				.phoneNumber("1000000").eMail(eMail).dateOfBirth(dateOfBirth).build();
 
 		return createdClient;
 	}
 
 	private BuildingTO createTestBuilding() {
 
-		Address address = Address.builder().street("Niepodleglosci")
-				.buildingNumber(String.valueOf((int) (Math.random() * 100 + 1)))
-				.flatNumber(String.valueOf((int) (Math.random() * 100 + 1)))
-				.postalCode(String.valueOf((int) (Math.random() * 100 + 1))).town("Poznan").country("Polska").build();
+		Address address = Address.builder().street("Niepodleglosci").buildingNumber("1").flatNumber("2")
+				.postalCode("60-777").town("Poznan").country("Polska").build();
 
-		BuildingTO createdBuilding = BuildingTO.builder()
-				.description("Nowy budynek nr " + String.valueOf(((int) (Math.random() * 1000)) + 1)).location(address)
-				.storeysNumber((int) (Math.random() * 10) + 1)
-				.hasElevator((int) (Math.random() * 2) == 0 ? false : true).flatCount(0).build();
+		BuildingTO createdBuilding = BuildingTO.builder().description("Nowy budynek").location(address).storeysNumber(1)
+				.hasElevator(false).flatCount(0).build();
 
 		return createdBuilding;
 	}
 
 	private FlatTO createTestFlat() {
 
-		Address address = Address.builder().street("Niepodleglosci")
-				.buildingNumber(String.valueOf((int) (Math.random() * 100 + 1)))
-				.flatNumber(String.valueOf((int) (Math.random() * 100 + 1)))
-				.postalCode(String.valueOf((int) (Math.random() * 100 + 1))).town("Poznan").country("Polska").build();
+		Address address = Address.builder().street("Niepodleglosci").buildingNumber("1").flatNumber("2")
+				.postalCode("60-777").town("Poznan").country("Polska").build();
 
 		FlatTO createdFlat = FlatTO.builder().area(0d).roomsCount(0).balconyCount(0).floorCount(0).location(address)
 				.status(FlatStatus.FREE).price(300000d).build();
 
 		return createdFlat;
 	}
-	
-	
-	
-	
-	
-	
-
 
 }

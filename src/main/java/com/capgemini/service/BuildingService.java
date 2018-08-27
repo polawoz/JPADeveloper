@@ -2,7 +2,6 @@ package com.capgemini.service;
 
 import java.util.List;
 
-import com.capgemini.domain.BuildingEntity;
 import com.capgemini.domain.enums.FlatStatus;
 import com.capgemini.types.BuildingTO;
 import com.capgemini.types.ClientTO;
@@ -32,8 +31,6 @@ public interface BuildingService {
 	FlatTO removeFlat(FlatTO flat);
 	
 	
-	//queries
-	
 	Double countPricesSumOfFlatsBoughtByClient(ClientTO client);
 	
 	Double countAveragePriceOfFlatInTheBuilding(BuildingTO building);
@@ -44,7 +41,7 @@ public interface BuildingService {
 	
 	List<BuildingTO> findBuildingsWithMaxmimumNumberFreeFlats();
 	
-	Long countFreeFlatFromBuilding(BuildingTO building);
+
 	
 	
 	

@@ -55,10 +55,10 @@ public class ClientsServiceImpl implements ClientsService {
 
 		ClientEntity clientEntity = clientDao.findOne(client.getId());
 
-		if(clientEntity==null){
+		if (clientEntity == null) {
 			return null;
 		}
-		
+
 		return clientMapper.mapToTO(clientEntity);
 	}
 
@@ -72,7 +72,7 @@ public class ClientsServiceImpl implements ClientsService {
 		}
 
 		if (flatEntity.getStatus().equals(FlatStatus.SOLD)) {
-			throw new CannotPerformActionException("Flat is already sold to other client!");
+			throw new CannotPerformActionException("Flat is already sold!");
 		}
 
 		ClientEntity ownerEntity = clientDao.findOne(owner.getId());
@@ -105,7 +105,7 @@ public class ClientsServiceImpl implements ClientsService {
 		if (flatEntity.getStatus() != FlatStatus.BOOKED) {
 			throw new CannotPerformActionException("This flat is not booked!");
 		}
-		if (flatEntity.getOwner().getId() != client.getId()) {
+		if (flatEntity.getOwner().getId().longValue() != client.getId().longValue()) {
 			throw new CannotPerformActionException("This flat can be bought only by the client who booked it!");
 		}
 
@@ -117,6 +117,15 @@ public class ClientsServiceImpl implements ClientsService {
 	@Override
 	public FlatTO buyFlat(FlatTO flat, ClientTO owner, List<ClientTO> coOwners) {
 		FlatEntity flatEntity = flatDao.findOne(flat.getId());
+
+		if (flatEntity.getStatus().equals(FlatStatus.BOOKED)) {
+			if (flatEntity.getOwner().getId().equals(owner.getId())) {
+				return buyFlatAfterReservation(flat, owner);
+			} else {
+				throw new CannotPerformActionException("This flat is already booked by other client!");
+			}
+
+		}
 
 		ClientEntity ownerEntity = clientDao.findOne(owner.getId());
 
@@ -167,20 +176,19 @@ public class ClientsServiceImpl implements ClientsService {
 		owner.removeOwnedFlat(flatToCancelReservation);
 
 		Iterator<ClientEntity> i = flatToCancelReservation.getCoOwners().iterator();
-		
+
 		while (i.hasNext()) {
-			   ClientEntity coOwner = i.next(); 
-			   coOwner.removeCoOwnedFlat(flatToCancelReservation);
-			   i.remove();
-			}
-		
+			ClientEntity coOwner = i.next();
+			coOwner.removeCoOwnedFlat(flatToCancelReservation);
+			i.remove();
+		}
 
 		flatToCancelReservation.setStatus(FlatStatus.FREE);
 
 		return flatMapper.mapToTO(flatToCancelReservation);
 
 	}
-	//TODO
+
 	@Override
 	public List<ClientTO> findClientsWhoBoughtFlatsMoreThan(Long flatNumber) {
 
@@ -193,7 +201,7 @@ public class ClientsServiceImpl implements ClientsService {
 	public List<FlatTO> findFlatsDisabledSuitable() {
 
 		List<FlatEntity> foundFlats = flatDao.findFlatsDisabledSuitable();
-		
+
 		return flatMapper.mapToTOList(foundFlats);
 	}
 

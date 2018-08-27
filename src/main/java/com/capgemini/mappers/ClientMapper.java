@@ -24,10 +24,8 @@ public class ClientMapper {
 				.lastName(newClient.getLastName()).firstName(newClient.getFirstName())
 				.address(createCopy(newClient.getAddress())).phoneNumber(newClient.getPhoneNumber())
 				.eMail(newClient.getEMail()).dateOfBirth(newClient.getDateOfBirth())
-				.flatsOwned(newClient.getFlatsOwnedIds() == null ? new ArrayList<FlatEntity>()
-						: new ArrayList<FlatEntity>())
-				.flatsCoOwned(newClient.getFlatsCoOwnedIds() == null ? new ArrayList<FlatEntity>()
-						: new ArrayList<FlatEntity>())
+				.flatsOwned(new ArrayList<FlatEntity>())
+				.flatsCoOwned(new ArrayList<FlatEntity>())
 				.build();
 		
 		newEntity.setVersion(newClient.getVersion());
