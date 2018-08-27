@@ -98,6 +98,10 @@ public class BuildingRepositoryImpl implements BuildingRepositoryCustom {
 				.limit(1)
 				.fetchOne();
 		
+		if(max==null){
+			return null;
+		}
+		
 		
 		List<BuildingEntity> resultMax = queryFactory.selectFrom(building)
 				.where(

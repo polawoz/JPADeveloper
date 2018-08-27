@@ -73,9 +73,15 @@ public class BuildingMapper {
 	}
 
 	public List<BuildingTO> mapToTOList(List<BuildingEntity> buildingEntityList) {
-
+		
+		if(buildingEntityList==null || buildingEntityList.isEmpty()){
+			return null;
+		}
+		
+		
 		List<BuildingTO> mappedList = new ArrayList<>();
 
+		
 		for (BuildingEntity b : buildingEntityList) {
 			mappedList.add(mapToTO(b));
 		}

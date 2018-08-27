@@ -1,6 +1,9 @@
 package com.capgemini.service;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.sql.Date;
 import java.util.ArrayList;
@@ -10,6 +13,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.MethodMode;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.capgemini.domain.Address;
@@ -728,16 +733,18 @@ public class ClientsServiceTest {
 		
 	}
 	
-	
+	@DirtiesContext(methodMode=MethodMode.BEFORE_METHOD)
 	@Test
 	public void testShouldFindBuildingsWithMaxmimumNumberFreeFlats(){
 		
 		//given
-		int foundBuildingsListBeforeSize = buildingService.findBuildingsWithMaxmimumNumberFreeFlats().size();
-		
+
+	
 		//Building 1
 		BuildingTO buildingToAdd = createTestBuilding();
+		buildingToAdd.setDescription("Maksymalna liczba mieszkan wolnych");
 		BuildingTO savedBuilding = buildingService.addBuilding(buildingToAdd);
+		
 		//Flat 1
 		FlatTO flatToAdd = createTestFlat();
 		FlatTO savedFlat = buildingService.addFlat(flatToAdd, savedBuilding);
@@ -757,12 +764,9 @@ public class ClientsServiceTest {
 		List<BuildingTO> foundBuildings = buildingService.findBuildingsWithMaxmimumNumberFreeFlats();
 		
 		
-		
-		
 		//then
-		assertEquals(foundBuildingsListBeforeSize+1, foundBuildings.size());
-		
-		
+		assertEquals(1, foundBuildings.size());
+		assertTrue(foundBuildings.stream().anyMatch(b->b.getDescription().equals(savedBuilding.getDescription())));
 		
 		
 	}
